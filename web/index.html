@@ -100,5 +100,28 @@
       loadMainDartJs();
     }
   </script>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.9.2/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqbVqvulnU-LcBmlT2EVCFKMGs8ZL2HmY",
+      authDomain: "qronica-7036c.firebaseapp.com",
+      projectId: "qronica-7036c",
+      storageBucket: "qronica-7036c.appspot.com",
+      messagingSenderId: "548636835753",
+      appId: "1:548636835753:web:deb6b844dea28cab99ceb8",
+      measurementId: "G-FQF7RN9C0J"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
 </body>
 </html>

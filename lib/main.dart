@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
@@ -225,12 +226,13 @@ class _AudioRecorderState extends State<AudioRecorder> {
 }
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -248,34 +250,47 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: showPlayer
-              ? Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
-                  child: AudioPlayer(
-                    source: audioPath,
-                    onDelete: () {
-                      setState(() => showPlayer = false);
-                    },
-                  ),
-                )
-              : AudioRecorder(
-                  onStop: (path) {
-                    if (kDebugMode) print('Recorded file path: $path');
-                    setState(() {
-                      audioPath = path;
-                      showPlayer = true;
+      home: FutureBuilder(
+        future: widget._initialization,
+        builder: (context, snapshot){
+          if(snapshot.hasError)
+          {
+            print("Error");
+          }
+          if (snapshot.connectionState == ConnectionState.done)
+          {
+            return Scaffold(
+              body: Center(
+                child: showPlayer
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 25),
+                        child: AudioPlayer(
+                          source: audioPath,
+                          onDelete: () {
+                            setState(() => showPlayer = false);
+                          },
+                        ),
+                      )
+                    : AudioRecorder(
+                        onStop: (path) {
+                          if (kDebugMode) print('Recorded file path: $path');
+                          setState(() {
+                            audioPath = path;
+                            showPlayer = true;
 
-                      print("audio path: $audioPath");
+                            print("audio path: $audioPath");
 
-                      // final data = File(audioPath).readAsBytesSync();
+                            // final data = File(audioPath).readAsBytesSync();
 
-                      // print("data length: ${data.length}");
-                    });
-                  },
-                ),
-        ),
+                            // print("data length: ${data.length}");
+                          });
+                        },
+                      ),
+              ),
+            );
+          }
+          return CircularProgressIndicator();
+        }
       ),
     );
   }
