@@ -36,7 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   record: ^4.0.2
   audioplayers: ^1.0.1
+  firebase_auth: ^3.6.2
   firebase_core: ^1.20.0
+  firebase_storage: ^10.3.5
 
 dev_dependencies:
   flutter_test:

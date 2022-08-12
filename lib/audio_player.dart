@@ -36,11 +36,11 @@ class AudioPlayerState extends State<AudioPlayer> {
   @override
   void initState() {
     _playerStateChangedSubscription =
-        _audioPlayer.onPlayerCompletion.listen((state) async {
+        _audioPlayer.onPlayerComplete.listen((state) async {
       await stop();
       setState(() {});
     });
-    _positionChangedSubscription = _audioPlayer.onAudioPositionChanged.listen(
+    _positionChangedSubscription = _audioPlayer.onPositionChanged.listen(
       (position) => setState(() {
         _position = position;
       }),
@@ -68,8 +68,8 @@ class AudioPlayerState extends State<AudioPlayer> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             _buildControl(),
             _buildSlider(constraints.maxWidth),
@@ -90,7 +90,7 @@ class AudioPlayerState extends State<AudioPlayer> {
     Icon icon;
     Color color;
 
-    if (_audioPlayer.state == ap.PlayerState.PLAYING) {
+    if (_audioPlayer.state == ap.PlayerState.playing) {
       icon = const Icon(Icons.pause, color: Colors.red, size: 30);
       color = Colors.red.withOpacity(0.1);
     } else {
@@ -106,7 +106,7 @@ class AudioPlayerState extends State<AudioPlayer> {
           child:
               SizedBox(width: _controlSize, height: _controlSize, child: icon),
           onTap: () {
-            if (_audioPlayer.state == ap.PlayerState.PLAYING) {
+            if (_audioPlayer.state == ap.PlayerState.playing) {
               pause();
             } else {
               play();
@@ -152,7 +152,7 @@ class AudioPlayerState extends State<AudioPlayer> {
     // return _audioPlayer.play(
     //   kIsWeb ? ap.UrlSource(widget.source) : ap.DeviceFileSource(widget.source),
     // );
-    return _audioPlayer.play(widget.source);
+    return _audioPlayer.play(ap.DeviceFileSource(widget.source));
   }
 
   Future<void> pause() => _audioPlayer.pause();
