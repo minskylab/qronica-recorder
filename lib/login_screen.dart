@@ -85,12 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 print(_emailController.text);
                 User? user = await login(email: _emailController.text, password: _passwordController.text, context: context);
                 print(user);
-                if (user != null)
-                {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => RecorderScreen()));
-                }
               },
-              child: Text("Login"),
+              child: const Text("Ingresar"),
               )
           )
         ],

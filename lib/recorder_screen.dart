@@ -48,9 +48,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Column(
+    return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Row(
@@ -69,9 +67,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
               Text('Max: ${_amplitude?.max ?? 0.0}'),
             ],
           ],
-        ),
-      ),
-    );
+        );
   }
 
   Widget _buildRecordStopControl() {
@@ -250,9 +246,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
   @override
   Widget build(BuildContext context) {
     final StorageService storage = StorageService();
-    return MaterialApp(
-    home: Scaffold(
-    body: Center(
+    return Center(
       child: showPlayer
           ? Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -338,7 +332,6 @@ class _RecorderScreenState extends State<RecorderScreen> {
                 });
               },
             ),
-    ),
-  ));
+    );
   }
 }
