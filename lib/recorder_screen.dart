@@ -12,7 +12,7 @@ import 'package:qronica_recorder/audio_player.dart';
 
 
 class AudioRecorder extends StatefulWidget {
-  final void Function(String path) onStop;
+  final void Function(String path, int duration) onStop;
 
   const AudioRecorder({
     Key? key,
@@ -31,6 +31,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
   Timer? _ampTimer;
   final _audioRecorder = Record();
   Amplitude? _amplitude;
+  DateTime? _inicio;
+  DateTime? _final;
 
   @override
   void initState() {
@@ -185,10 +187,13 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
   Future<void> _stop() async {
     _timer?.cancel();
+    _final = DateTime.now();
     _ampTimer?.cancel();
     final path = await _audioRecorder.stop();
+    int mili = _final!.difference(_inicio!).inMilliseconds;
+    print('miliiis:$mili');
 
-    widget.onStop(path!);
+    widget.onStop(path!, mili);
 
     setState(() => _isRecording = false);
   }
@@ -209,6 +214,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
   }
 
   void _startTimer() {
+    _inicio =  DateTime.now(); 
+
     _timer?.cancel();
     _ampTimer?.cancel();
 
@@ -236,6 +243,7 @@ class RecorderScreen extends StatefulWidget {
 class _RecorderScreenState extends State<RecorderScreen> {
   bool showPlayer = false;
   String audioPath = "";
+  int durationTotal = 0;
 
   @override
   void initState() {
@@ -255,6 +263,8 @@ class _RecorderScreenState extends State<RecorderScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 25),
                 child: AudioPlayer(
                   source: audioPath,
+                  duration: durationTotal
+,
                   onDelete: () {
                     setState(() => showPlayer = false);
                   },
@@ -318,11 +328,12 @@ class _RecorderScreenState extends State<RecorderScreen> {
             ],
           )
           : AudioRecorder(
-              onStop: (path) {
+              onStop: (path,duration) {
                 if (kDebugMode) print('Recorded file path: $path');
                 setState(() {
                   audioPath = path;
                   showPlayer = true;
+                  durationTotal = duration;
 
                   print("audio path: $audioPath");
 
