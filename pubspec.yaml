@@ -44,6 +44,9 @@ dependencies:
   just_audio: ^0.9.28
   audio_video_progress_bar: ^0.9.0
   flutter_media_metadata: ^1.0.0
+  pocketbase: ^0.4.0
+  flutter_bloc: ^8.1.1
+  equatable: ^2.0.5
 
 
 dev_dependencies:
