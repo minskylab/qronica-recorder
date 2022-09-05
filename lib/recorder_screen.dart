@@ -51,7 +51,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                     var uri = Uri.dataFromString(audioPath);
                     final fileName = uri.pathSegments[3];                    
                     storage
-                        .uploadAudio(path, fileName);
+                        .uploadAudio(path, fileName, durationTotal);
                     setState(() {
                     });
                   },
@@ -82,6 +82,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                 print(url);
                                 setState(() {
                                   audioPath = url;
+                                  durationTotal = snapshot.data!.elementAt(index).data['duration'];
                                 });
                               }, 
                               child: Text(snapshot.data!.elementAt(index).id),)

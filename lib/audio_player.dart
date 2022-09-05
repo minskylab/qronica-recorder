@@ -1,6 +1,7 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:just_audio/just_audio.dart' as ja; 
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:qronica_recorder/bar_manager.dart';
 
 class AudioPlayer extends StatefulWidget {
@@ -24,41 +25,107 @@ class AudioPlayer extends StatefulWidget {
 }
 
 class AudioPlayerState extends State<AudioPlayer> {
-  late final PageManager _pageManager;
-  final player = ja.AudioPlayer();                   // Create a player
+  final progressNotifier = ValueNotifier<ProgressBarState>(
+    ProgressBarState(
+      current: Duration.zero,
+      buffered: Duration.zero,
+      total: Duration.zero,
+    ),
+  );
+  final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
+  final _audioPlayer = ja.AudioPlayer();                   // Create a player
 
   @override
   void initState() {
     super.initState();
-    _pageManager = PageManager(widget.source, widget.duration);
+    _init();
 
   }
 
   @override
   void dispose() {
-    _pageManager.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
-  @override
+  void _init() async {
+
+    _audioPlayer.playerStateStream.listen((playerState) {
+      final isPlaying = playerState.playing;
+      final processingState = playerState.processingState;
+      if (processingState == ProcessingState.loading ||
+          processingState == ProcessingState.buffering) {
+        buttonNotifier.value = ButtonState.loading;
+      } else if (!isPlaying) {
+        buttonNotifier.value = ButtonState.paused;
+      } else if (processingState != ProcessingState.completed) {
+        buttonNotifier.value = ButtonState.playing;
+      } else {
+        _audioPlayer.seek(Duration.zero);
+        _audioPlayer.pause();
+      }
+    });
+
+    _audioPlayer.positionStream.listen((position) {
+      final oldState = progressNotifier.value;
+      progressNotifier.value = ProgressBarState(
+        current: position,
+        buffered: oldState.buffered,
+        total: oldState.total,
+      );
+    });
+
+    //_audioPlayer.bufferedPositionStream.listen((bufferedPosition) {
+    //  final oldState = progressNotifier.value;
+    //  progressNotifier.value = ProgressBarState(
+    //    current: oldState.current,
+    //    buffered: bufferedPosition,
+    //    total: oldState.total,
+    //  );
+    //});
+
+    _audioPlayer.durationStream.listen((totalDuration) {
+      final oldState = progressNotifier.value;
+      progressNotifier.value = ProgressBarState(
+        current: oldState.current,
+        buffered: Duration(milliseconds:widget.duration),
+        total: Duration(milliseconds:widget.duration),
+      );
+    });
+  }
+
+  void play() async{
+    await _audioPlayer.setUrl(widget.source);
+    _audioPlayer.play();
+  }
+
+  void pause() {
+    _audioPlayer.pause();
+  }
+
+  void seek(Duration position) {
+    _audioPlayer.seek(position);
+  }
+
+    @override
   Widget build(BuildContext context) {
     return Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
               ValueListenableBuilder<ProgressBarState>(
-                valueListenable: _pageManager.progressNotifier,
+                valueListenable: progressNotifier,
                 builder: (_, value, __) {
                   return ProgressBar(
                     progress: value.current,
                     buffered: value.buffered,
                     total: value.total,
-                    onSeek: _pageManager.seek,
+                    onSeek: seek,
                   );
                 },
               ),
               ValueListenableBuilder<ButtonState>(
-                valueListenable: _pageManager.buttonNotifier,
+                valueListenable: buttonNotifier,
                 builder: (_, value, __) {
                   switch (value) {
                     case ButtonState.loading:
@@ -72,13 +139,13 @@ class AudioPlayerState extends State<AudioPlayer> {
                       return IconButton(
                         icon: const Icon(Icons.play_arrow),
                         iconSize: 32.0,
-                        onPressed: _pageManager.play,
+                        onPressed: play,
                       );
                     case ButtonState.playing:
                       return IconButton(
                         icon: const Icon(Icons.pause),
                         iconSize: 32.0,
-                        onPressed: _pageManager.pause,
+                        onPressed:pause,
                       );
                   }
                 },
@@ -87,5 +154,17 @@ class AudioPlayerState extends State<AudioPlayer> {
           ),
         );
   }
-
 }
+
+class ProgressBarState {
+  ProgressBarState({
+    required this.current,
+    required this.buffered,
+    required this.total,
+  });
+  final Duration current;
+  final Duration buffered;
+  final Duration total;
+}
+
+enum ButtonState { paused, playing, loading }

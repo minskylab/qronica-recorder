@@ -36,6 +36,7 @@ class StorageService {
   Future<void> uploadAudio(
     String path,
     String fileName,
+    int duration,
   ) async {
     await getCurrentPosition();
     Uri myUri = Uri.parse(path);
@@ -45,6 +46,7 @@ class StorageService {
     body: {
     'user': PocketBaseSample.client.authStore.model.id,
     'location': position.toString(),
+    'duration' : duration
     },
     files:[
       http.MultipartFile.fromBytes(
