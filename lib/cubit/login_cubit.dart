@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:pocketbase/pocketbase.dart';
+import 'package:qronica_recorder/local_storage.dart';
 import 'package:qronica_recorder/pocketbase.dart';
+
 
 part 'login_state.dart';
 
@@ -21,6 +23,13 @@ class LoginCubit extends Cubit<LoginState> {
     );
   }
 
+    void cleanError() {
+    emit(
+      state.copyWith(
+        status: StatusLogin.initial,
+      ),
+    );
+  }
 
   Future<void> login() async {
     emit(
@@ -31,7 +40,9 @@ class LoginCubit extends Cubit<LoginState> {
     try{
       final authData = await 
       PocketBaseSample.client.users.authViaEmail(state.emailAddress!,state.password!);
-      print(authData.user!.id);
+      LocalStorageHelper.saveValue('loggedIn', 'true');
+      LocalStorageHelper.saveValue('token',authData.token);
+      LocalStorageHelper.saveValue('userId',authData.user!.id);
       PocketBaseSample.client.authStore.save(authData.token, authData.user);
 
       emit(
@@ -41,6 +52,11 @@ class LoginCubit extends Cubit<LoginState> {
     );
     }
     catch(error){
+      emit(
+      state.copyWith(
+        status: StatusLogin.failure,
+      ),
+    );
       print('Error: ${error}');
     };
 

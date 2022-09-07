@@ -1,27 +1,33 @@
+import 'dart:async';
+
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:just_audio/just_audio.dart' as ja; 
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:qronica_recorder/bar_manager.dart';
+
 
 class AudioPlayer extends StatefulWidget {
   /// Path from where to play recorded audio
-  final String source;
-  final int duration;
+  late String source;
+  late int duration;
+  late bool newAudio;
 
   /// Callback when audio file should be removed
   /// Setting this to null hides the delete button
   final VoidCallback onDelete;
 
-  const AudioPlayer({
+  AudioPlayer({
     Key? key,
     required this.source,
     required this.duration,
+    required this.newAudio,
     required this.onDelete,
   }) : super(key: key);
 
   @override
   AudioPlayerState createState() => AudioPlayerState();
+
+
 }
 
 class AudioPlayerState extends State<AudioPlayer> {
@@ -48,8 +54,10 @@ class AudioPlayerState extends State<AudioPlayer> {
     super.dispose();
   }
 
-  void _init() async {
 
+  void _init() async {
+    print('llamando}');
+    await _audioPlayer.setUrl(widget.source);
     _audioPlayer.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
       final processingState = playerState.processingState;
@@ -94,8 +102,13 @@ class AudioPlayerState extends State<AudioPlayer> {
     });
   }
 
-  void play() async{
+  void play() async {
+    print("widgets audio:${widget.newAudio}");
+    print("widgets source:${widget.source}");
+    if (widget.newAudio == true) {
     await _audioPlayer.setUrl(widget.source);
+      widget.newAudio = false;
+    }
     _audioPlayer.play();
   }
 
@@ -150,6 +163,14 @@ class AudioPlayerState extends State<AudioPlayer> {
                   }
                 },
               ),
+              IconButton(
+              icon: const Icon(Icons.delete,
+                  color: Color(0xFF73748D), size: 24),
+              onPressed: () {
+                pause();
+                widget.onDelete();
+              },
+            ),
             ],
           ),
         );

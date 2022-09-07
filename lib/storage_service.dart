@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pocketbase/pocketbase.dart';
+import 'package:qronica_recorder/local_storage.dart';
 import 'package:qronica_recorder/pocketbase.dart';
 
 class StorageService {
@@ -42,9 +43,13 @@ class StorageService {
     Uri myUri = Uri.parse(path);
     final http.Response responseData = await http.get(myUri);
     final uint8list = responseData.bodyBytes;
+    if (PocketBaseSample.client.authStore.isValid == false)
+    {
+      PocketBaseSample.client.authStore.save(LocalStorageHelper.getValue('token')!, UserModel);
+    }
     final record = await PocketBaseSample.client.records.create('records', 
     body: {
-    'user': PocketBaseSample.client.authStore.model.id,
+    'user': LocalStorageHelper.getValue('userId'),
     'location': position.toString(),
     'duration' : duration
     },
@@ -62,6 +67,16 @@ class StorageService {
     final records = await PocketBaseSample.client.records.getFullList('records', batch: 200, sort: '-created');
     print(records);
     return records;
+  }
+  Stream<RecordModel?> getRecord() async* {
+    late RecordModel? prueba;
+    final client = PocketBase('http://127.0.0.1:8090');
+    client.users.authViaEmail('ju@li.com', 'julian29');
+    client.realtime.subscribe('records', (e) {
+    print(e.record);
+    prueba = e.record;
+    });
+    yield prueba;
   }
 
 

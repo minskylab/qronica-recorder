@@ -47,6 +47,8 @@ dependencies:
   pocketbase: ^0.4.0
   flutter_bloc: ^8.1.1
   equatable: ^2.0.5
+  universal_html: ^2.0.8
+  toast: ^0.2.9
 
 
 dev_dependencies:
