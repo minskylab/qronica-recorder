@@ -96,7 +96,7 @@ class AudioPlayerState extends State<AudioPlayer> {
       final oldState = progressNotifier.value;
       progressNotifier.value = ProgressBarState(
         current: oldState.current,
-        buffered: Duration(milliseconds:widget.duration),
+        buffered: oldState.buffered,
         total: Duration(milliseconds:widget.duration),
       );
     });

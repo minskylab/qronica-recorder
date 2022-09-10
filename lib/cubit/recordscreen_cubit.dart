@@ -4,5 +4,13 @@ import 'package:equatable/equatable.dart';
 part 'recordscreen_state.dart';
 
 class RecordscreenCubit extends Cubit<RecordscreenState> {
-  RecordscreenCubit() : super(RecordscreenInitial());
+  RecordscreenCubit() : super(RecordscreenState());
+
+  void savedAudio() {
+      emit(
+      state.copyWith(
+        status: StatusRecorder.saved,
+      ),
+    );
+  }
 }

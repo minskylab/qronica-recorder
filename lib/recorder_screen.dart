@@ -22,6 +22,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
   bool showPlayer = false;
   String audioPath = "";
   int durationTotal = 0;
+  final StorageService storage = StorageService();
 
   @override
   void initState() {
@@ -29,9 +30,20 @@ class _RecorderScreenState extends State<RecorderScreen> {
     super.initState();
   }
 
+  Future<void> asyncUpload(BuildContext context, VoidCallback onSuccess) async {
+        setState(() {
+      context.read<AudioplayerCubit>().uploading();
+    });
+    final path = audioPath;
+    var uri = Uri.dataFromString(audioPath);
+    final fileName = uri.pathSegments[3];
+    await storage.uploadAudio(path, fileName, durationTotal);
+
+    onSuccess.call();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final StorageService storage = StorageService();
     return BlocProvider(
       create: (context) => AudioplayerCubit(),
       child: BlocBuilder<AudioplayerCubit, AudioplayerState>(
@@ -43,37 +55,56 @@ class _RecorderScreenState extends State<RecorderScreen> {
                     children: [
                       Padding(
                           padding: EdgeInsets.symmetric(horizontal: 25),
-                          child: state.status == StatusAudioPlayer.ready ? Column(
-                            children: [
-                              Text("Audio: ${state.source}"),
-                              Text("Duration: ${state.duration}"),
-                              Text("New audio: ${state.newAudio}"),
-                              AudioPlayer(
-                                source: state.source!,
-                                duration: state.duration!,
-                                newAudio: state.newAudio!,
-                                onDelete: () {
-                                  setState(() => showPlayer = false);
-                                },
-                              ),
-                            ],
-                          ) : CircularProgressIndicator()
-                          ),
+                          child:
+                              BlocBuilder<AudioplayerCubit, AudioplayerState>(
+                                  builder: ((context, state) {
+                            if (state.status == StatusAudioPlayer.ready) {
+                              return Column(
+                                children: [
+                                  Text("Audio: ${state.source}"),
+                                  Text("Duration: ${state.duration}"),
+                                  Text("New audio: ${state.newAudio}"),
+                                  AudioPlayer(
+                                    source: state.source!,
+                                    duration: state.duration!,
+                                    newAudio: state.newAudio!,
+                                    onDelete: () {
+                                      setState(() {
+                                    context.read<AudioplayerCubit>().notUploaded();
+
+                                        showPlayer = false;
+                                        })
+                                      ;
+                                      
+                                    },
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          }))),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25),
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              final path = audioPath;
-                              var uri = Uri.dataFromString(audioPath);
-                              final fileName = uri.pathSegments[3];
-                              await storage.uploadAudio(
-                                  path, fileName, durationTotal);
-                              setState(() {
-                                
-                              });
-                            },
-                            child: const Text("Guardar audio")),
-                      ),
+                          padding: const EdgeInsets.symmetric(horizontal: 25),
+                          child:
+                              BlocBuilder<AudioplayerCubit, AudioplayerState>(
+                            builder: ((context, state) {
+                              if (state.uploaded == StatusAudioUpload.yet) {
+                                return ElevatedButton(
+                                    onPressed: () => asyncUpload(context, () {
+                                          context
+                                              .read<AudioplayerCubit>()
+                                              .uploaded();
+                                        }),
+                                    child: const Text("Guardar audio"));
+                              } else if (state.uploaded ==
+                                  StatusAudioUpload.inProgress) {
+                                return const CircularProgressIndicator();
+                              } else {
+                                return const Text("Guardado");
+                              }
+                            }),
+                          )),
                       const SizedBox(
                         height: 26.0,
                       ),
@@ -81,8 +112,8 @@ class _RecorderScreenState extends State<RecorderScreen> {
                       //  stream: storage.getRecord(),
                       //  builder: (context, snapshot) {
                       //  if (snapshot.connectionState == ConnectionState.done) {
-                      //    var record = snapshot.data!; 
-                      //    print('Snapshot: ${record}');
+                      //    var record = snapshot.data!;
+                      //    print('Snapshot: ');
                       //    return Container();
                       //  } else {
                       //    return CircularProgressIndicator();
@@ -114,7 +145,10 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                                 durationTotal = snapshot.data!
                                                     .elementAt(index)
                                                     .data['duration'];
-                                              context.read<AudioplayerCubit>().update(audioPath, durationTotal, true);
+                                                context
+                                                    .read<AudioplayerCubit>()
+                                                    .update(audioPath,
+                                                        durationTotal, true);
                                               });
                                             },
                                             child: Text(snapshot.data!
@@ -125,10 +159,10 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                   ));
                             }
                             if (snapshot.connectionState ==
-                                    ConnectionState.waiting ||
-                                !snapshot.hasData) {
+                                    ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             }
+                            
                             return Container();
                           })
                     ],
@@ -140,7 +174,9 @@ class _RecorderScreenState extends State<RecorderScreen> {
                         audioPath = path;
                         showPlayer = true;
                         durationTotal = duration;
-                        context.read<AudioplayerCubit>().update(audioPath, durationTotal, false);
+                        context
+                            .read<AudioplayerCubit>()
+                            .update(audioPath, durationTotal, false);
                       });
                     },
                   ),
@@ -150,4 +186,3 @@ class _RecorderScreenState extends State<RecorderScreen> {
     );
   }
 }
-

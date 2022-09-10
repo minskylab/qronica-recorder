@@ -22,4 +22,28 @@ class AudioplayerCubit extends Cubit<AudioplayerState> {
       ),
     );
   }
+
+  void uploading() {
+        emit(
+      state.copyWith(
+        uploaded: StatusAudioUpload.inProgress,
+      ),
+    );
+  }
+
+    void uploaded() {
+        emit(
+      state.copyWith(
+        uploaded: StatusAudioUpload.done,
+      ),
+    );
+  }
+
+  void notUploaded() {
+            emit(
+      state.copyWith(
+        uploaded: StatusAudioUpload.yet,
+      ),
+    );
+  }
 }
