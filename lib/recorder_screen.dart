@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +10,7 @@ import 'package:qronica_recorder/cubit/audioplayer_cubit.dart';
 import 'package:qronica_recorder/pocketbase.dart';
 import 'package:qronica_recorder/storage_service.dart';
 import 'package:qronica_recorder/audio_player.dart';
-import 'package:qronica_recorder/widgets/audiorecorder.dart';
+import 'package:qronica_recorder/audiorecorder.dart';
 
 class RecorderScreen extends StatefulWidget {
   RecorderScreen({Key? key}) : super(key: key);
@@ -90,13 +91,49 @@ class _RecorderScreenState extends State<RecorderScreen> {
                               BlocBuilder<AudioplayerCubit, AudioplayerState>(
                             builder: ((context, state) {
                               if (state.uploaded == StatusAudioUpload.yet) {
-                                return ElevatedButton(
+                                return Column(
+                                  children: [
+                                  FutureBuilder(
+                                    future: storage.listProjects(),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<List<RecordModel>> snapshot) {
+                                      if (snapshot.connectionState ==
+                                              ConnectionState.done &&
+                                          snapshot.hasData) {
+                                          var data = snapshot.data;
+                                          final names = <String>[];
+                                          final ids = <String>[];
+                                          for(int i = 0; i < data!.length; i++) {
+                                            names.add(data.elementAt(i).data['name']);
+                                            ids.add(data.elementAt(i).id);
+                                          }
+                                        return CustomCheckBoxGroup(
+                                      buttonLables: names,
+                                      buttonValuesList: ids,
+                                      checkBoxButtonValues: (values) => print(values),
+                                      horizontal: true,
+                                      width: 50,
+                                      selectedColor: Colors.blue,
+                                      padding: 5, unSelectedColor: Colors.white,
+                                      );
+                                      }
+                                      if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                        return const CircularProgressIndicator();
+                                      }
+                                      
+                                      return Container();
+                                    })
+                                    ,
+                                    ElevatedButton(
                                     onPressed: () => asyncUpload(context, () {
                                           context
                                               .read<AudioplayerCubit>()
                                               .uploaded();
                                         }),
-                                    child: const Text("Guardar audio"));
+                                    child: const Text("Guardar audio"))
+                                  ],
+                                );
                               } else if (state.uploaded ==
                                   StatusAudioUpload.inProgress) {
                                 return const CircularProgressIndicator();

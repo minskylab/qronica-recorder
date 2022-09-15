@@ -48,6 +48,7 @@ dependencies:
   flutter_bloc: ^8.1.1
   equatable: ^2.0.5
   universal_html: ^2.0.8
+  custom_radio_grouped_button: ^2.1.2+2
   toast: ^0.2.9
 
 
