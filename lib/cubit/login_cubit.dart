@@ -31,6 +31,14 @@ class LoginCubit extends Cubit<LoginState> {
     );
   }
 
+    void logout() {
+    emit(
+      state.copyWith(
+        status: StatusLogin.initial,
+      ),
+    );
+  }
+
   Future<void> login() async {
     emit(
       state.copyWith(

@@ -8,6 +8,7 @@ class AudioplayerState extends Equatable {
   const AudioplayerState({
     this.status = StatusAudioPlayer.ready,
     this.source,
+    this.sourceName = "Audio Grabado",
     this.duration,
     this.newAudio = false,
     this.uploaded = StatusAudioUpload.yet,
@@ -15,6 +16,7 @@ class AudioplayerState extends Equatable {
 
   final StatusAudioPlayer status;
   final String? source;
+  final String? sourceName;
   final int? duration;
   final bool? newAudio;
   final StatusAudioUpload uploaded;
@@ -23,6 +25,7 @@ class AudioplayerState extends Equatable {
   List<Object?> get props => [
     status,
     source,
+    sourceName,
     duration,
     uploaded
   ];
@@ -31,6 +34,7 @@ class AudioplayerState extends Equatable {
   AudioplayerState copyWith({
     StatusAudioPlayer? status,
     String? source,    
+    String? sourceName,
     int? duration,
     bool? newAudio,    
     StatusAudioUpload? uploaded,
@@ -38,6 +42,7 @@ class AudioplayerState extends Equatable {
     return AudioplayerState(
       status: status ?? this.status,
       source: source ?? this.source,
+      sourceName: sourceName ?? this.sourceName,
       duration: duration ?? this.duration,
       newAudio: newAudio ?? this.newAudio,
       uploaded: uploaded ?? this.uploaded,

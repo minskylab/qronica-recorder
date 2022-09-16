@@ -27,40 +27,56 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     ToastContext().init(context);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: BlocProvider(
-        create: (context) => LoginCubit(),
-        child: BlocBuilder<LoginCubit, LoginState>(
-          builder: (context, state) {
-            if (state.status == StatusLogin.success|| LocalStorageHelper.getValue('loggedIn') == 'true')
-            {
-              return RecorderScreen();
-            }
-            else if (state.status == StatusLogin.initial)
-            {
-              return LoginScreen();
-            }
-            if (state.status == StatusLogin.failure)
-              {
-                Toast.show("Correo o contraseña incorrectos",
-                  duration: Toast.lengthShort,
-                  backgroundColor: Colors.red,
-                  gravity:  Toast.bottom
-                );
-                context.read<LoginCubit>().cleanError();
-              }
-            else if (state.status == StatusLogin.loading){
-              return const CircularProgressIndicator();
-            }
-            return Container();
-          },
-        ),
-      ),
-        ),
+    return BlocProvider(
+      create: (context) => LoginCubit(),
+      child: BlocBuilder<LoginCubit, LoginState>(
+        builder: (context, state) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              appBar: AppBar(actions: [
+                BlocBuilder<LoginCubit, LoginState>(
+                  builder: (context, state) {
+                    if (state.status == StatusLogin.success ||
+                        LocalStorageHelper.getValue('loggedIn') == 'true') {
+                      return SizedBox(
+                          width: 60,
+                          child: InkWell(
+                              onTap: <Widget>() {
+                                LocalStorageHelper.clearAll();
+                                context.read<LoginCubit>().logout();
+                              },
+                              child: const Icon(Icons.logout)));
+                    }
+                    return Container();
+                  },
+                ),
+              ]),
+              body: Center(
+                child: BlocBuilder<LoginCubit, LoginState>(
+                  builder: (context, state) {
+                    if (state.status == StatusLogin.success ||
+                        LocalStorageHelper.getValue('loggedIn') == 'true') {
+                      return RecorderScreen();
+                    } else if (state.status == StatusLogin.initial) {
+                      return LoginScreen();
+                    }
+                    if (state.status == StatusLogin.failure) {
+                      Toast.show("Correo o contraseña incorrectos",
+                          duration: Toast.lengthShort,
+                          backgroundColor: Colors.red,
+                          gravity: Toast.bottom);
+                      context.read<LoginCubit>().cleanError();
+                    } else if (state.status == StatusLogin.loading) {
+                      return const CircularProgressIndicator();
+                    }
+                    return Container();
+                  },
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

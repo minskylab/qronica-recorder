@@ -23,6 +23,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
   bool showPlayer = false;
   String audioPath = "";
   int durationTotal = 0;
+  List<String> projectIds = [];
   final StorageService storage = StorageService();
 
   @override
@@ -38,7 +39,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
     final path = audioPath;
     var uri = Uri.dataFromString(audioPath);
     final fileName = uri.pathSegments[3];
-    await storage.uploadAudio(path, fileName, durationTotal);
+    await storage.uploadAudio(path, fileName, durationTotal, projectIds);
 
     onSuccess.call();
   }
@@ -51,159 +52,205 @@ class _RecorderScreenState extends State<RecorderScreen> {
         builder: (context, state) {
           return Center(
             child: showPlayer
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 25),
-                          child:
-                              BlocBuilder<AudioplayerCubit, AudioplayerState>(
-                                  builder: ((context, state) {
-                            if (state.status == StatusAudioPlayer.ready) {
-                              return Column(
-                                children: [
-                                  Text("Audio: ${state.source}"),
-                                  Text("Duration: ${state.duration}"),
-                                  Text("New audio: ${state.newAudio}"),
-                                  AudioPlayer(
-                                    source: state.source!,
-                                    duration: state.duration!,
-                                    newAudio: state.newAudio!,
-                                    onDelete: () {
-                                      setState(() {
-                                    context.read<AudioplayerCubit>().notUploaded();
-
-                                        showPlayer = false;
-                                        })
-                                      ;
-                                      
-                                    },
-                                  ),
-                                ],
-                              );
-                            } else {
-                              return CircularProgressIndicator();
-                            }
-                          }))),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 25),
-                          child:
-                              BlocBuilder<AudioplayerCubit, AudioplayerState>(
-                            builder: ((context, state) {
-                              if (state.uploaded == StatusAudioUpload.yet) {
-                                return Column(
+                ? ListView(
+                  children:[ Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                            child:
+                                BlocBuilder<AudioplayerCubit, AudioplayerState>(
+                                    builder: ((context, state) {
+                              if (state.status == StatusAudioPlayer.ready) {
+                                if (state.uploaded == StatusAudioUpload.done) {
+                                  return Column(
                                   children: [
-                                  FutureBuilder(
-                                    future: storage.listProjects(),
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<List<RecordModel>> snapshot) {
-                                      if (snapshot.connectionState ==
-                                              ConnectionState.done &&
-                                          snapshot.hasData) {
-                                          var data = snapshot.data;
-                                          final names = <String>[];
-                                          final ids = <String>[];
-                                          for(int i = 0; i < data!.length; i++) {
-                                            names.add(data.elementAt(i).data['name']);
-                                            ids.add(data.elementAt(i).id);
-                                          }
-                                        return CustomCheckBoxGroup(
-                                      buttonLables: names,
-                                      buttonValuesList: ids,
-                                      checkBoxButtonValues: (values) => print(values),
-                                      horizontal: true,
-                                      width: 50,
-                                      selectedColor: Colors.blue,
-                                      padding: 5, unSelectedColor: Colors.white,
-                                      );
-                                      }
-                                      if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                        return const CircularProgressIndicator();
-                                      }
-                                      
-                                      return Container();
-                                    })
-                                    ,
-                                    ElevatedButton(
-                                    onPressed: () => asyncUpload(context, () {
-                                          context
-                                              .read<AudioplayerCubit>()
-                                              .uploaded();
-                                        }),
-                                    child: const Text("Guardar audio"))
+                                    Text("Reproduciendo audio: ${state.sourceName}",
+                                    style: TextStyle(height:5, fontSize:20),),
+                                    Text("Audio: ${state.source}"),
+                                    Text("Duration: ${state.duration}"),
+                                    Text("New audio: ${state.newAudio}"),
+                                    AudioPlayer(
+                                      source: state.source!,
+                                      duration: state.duration!,
+                                      newAudio: state.newAudio!,
+                                      option: 'back',
+                                      onDelete: () {
+                                        setState(() {
+                                      context.read<AudioplayerCubit>().notUploaded();
+                                          showPlayer = false;
+                                          })
+                                        ;
+                                        
+                                      },
+                                    ),
                                   ],
                                 );
-                              } else if (state.uploaded ==
-                                  StatusAudioUpload.inProgress) {
-                                return const CircularProgressIndicator();
-                              } else {
-                                return const Text("Guardado");
                               }
-                            }),
-                          )),
-                      const SizedBox(
-                        height: 26.0,
-                      ),
-                      //StreamBuilder(
-                      //  stream: storage.getRecord(),
-                      //  builder: (context, snapshot) {
-                      //  if (snapshot.connectionState == ConnectionState.done) {
-                      //    var record = snapshot.data!;
-                      //    print('Snapshot: ');
-                      //    return Container();
-                      //  } else {
-                      //    return CircularProgressIndicator();
-                      //  }
-                      //  }
-                      //),
-                      FutureBuilder(
-                          future: storage.listFiles(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<RecordModel>> snapshot) {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                snapshot.hasData) {
-                              return Container(
-                                  height: 200,
-                                  width: 400,
-                                  child: ListView.builder(
-                                    itemCount: snapshot.data!.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: ElevatedButton(
-                                            onPressed: () async {
-                                              final url =
-                                                  'http://127.0.0.1:8090/api/files/records/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['audio']}';
-                                              setState(() {
-                                                audioPath = url;
-                                                durationTotal = snapshot.data!
-                                                    .elementAt(index)
-                                                    .data['duration'];
-                                                context
-                                                    .read<AudioplayerCubit>()
-                                                    .update(audioPath,
-                                                        durationTotal, true);
-                                              });
-                                            },
-                                            child: Text(snapshot.data!
-                                                .elementAt(index)
-                                                .id),
-                                          ));
-                                    },
-                                  ));
-                            }
-                            if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                              return const CircularProgressIndicator();
-                            }
-                            
-                            return Container();
-                          })
-                    ],
-                  )
+                                return Column(
+                                  children: [
+                                    Text("Reproduciendo audio: ${state.sourceName}",
+                                    style: TextStyle(height:5, fontSize:20),),
+                                    Text("Audio: ${state.source}"),
+                                    Text("Duration: ${state.duration}"),
+                                    Text("New audio: ${state.newAudio}"),
+                                    AudioPlayer(
+                                      source: state.source!,
+                                      duration: state.duration!,
+                                      newAudio: state.newAudio!,
+                                      option:'new',
+                                      onDelete: () {
+                                        setState(() {
+                                      context.read<AudioplayerCubit>().notUploaded();
+                                          showPlayer = false;
+                                          })
+                                        ;
+                                        
+                                      },
+                                    ),
+                                  ],
+                                );
+                              }
+                    
+                              else {
+                                return CircularProgressIndicator();
+                              }
+                            }))),
+                        Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 25),
+                            child:
+                                BlocBuilder<AudioplayerCubit, AudioplayerState>(
+                              builder: ((context, state) {
+                                if (state.uploaded == StatusAudioUpload.yet) {
+                                  return Column(
+                                    children: [
+                                    Text("Opciones de guardado"),
+                                    Text("Seleccionar los proyectos a vincular:"),
+                                    FutureBuilder(
+                                      future: storage.listProjects(),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<List<RecordModel>> snapshot) {
+                                        if (snapshot.connectionState ==
+                                                ConnectionState.done &&
+                                            snapshot.hasData) {
+                                            var data = snapshot.data;
+                                            final names = <String>[];
+                                            final ids = <String>[];
+                                            for(int i = 0; i < data!.length; i++) {
+                                              names.add(data.elementAt(i).data['name']);
+                                              ids.add(data.elementAt(i).id);
+                                            }
+                                        return Padding(
+                                          padding: const EdgeInsets.only(left: 500, right: 500),
+                                          child: CustomCheckBoxGroup(
+                                            buttonLables: names,
+                                            buttonValuesList: ids,
+                                            checkBoxButtonValues: (values) {
+                                                  for(int i = 0; i < values.length; i++) {
+                                                    projectIds.add(values[i].toString());
+                                                  } 
+                                              print(values);
+                                              },
+                                            horizontal: true,
+                                            width: 50,
+                                            selectedColor: Colors.blue,
+                                            padding: 5, unSelectedColor: Colors.white,
+                                          ),
+                                        );
+                                        }
+                                        if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                        }
+                                        
+                                        return Container();
+                                      })
+                                      ,
+                                      ElevatedButton(
+                                      onPressed: () => asyncUpload(context, () {
+                                            context
+                                                .read<AudioplayerCubit>()
+                                                .uploaded();
+                                          }),
+                                      child: const Text("Guardar audio"))
+                                    ],
+                                  );
+                                } else if (state.uploaded ==
+                                    StatusAudioUpload.inProgress) {
+                                  return const CircularProgressIndicator();
+                                } else {
+                                  return const Text("Guardado");
+                                }
+                              }),
+                            )),
+                        const SizedBox(
+                          height: 26.0,
+                        ),
+                        //StreamBuilder(
+                        //  stream: storage.getRecord(),
+                        //  builder: (context, snapshot) {
+                        //  if (snapshot.connectionState == ConnectionState.done) {
+                        //    var record = snapshot.data!;
+                        //    print('Snapshot: ');
+                        //    return Container();
+                        //  } else {
+                        //    return CircularProgressIndicator();
+                        //  }
+                        //  }
+                        //),
+                        FutureBuilder(
+                            future: storage.listFiles(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List<RecordModel>> snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.hasData) {
+                                return Container(
+                                    height: 200,
+                                    width: 400,
+                                    child: ListView.builder(
+                                      itemCount: snapshot.data!.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: ElevatedButton(
+                                                onPressed: () async {
+                                                final url =
+                                                    'http://127.0.0.1:8090/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
+                                                setState(() {
+                                                  audioPath = url;
+                                                  durationTotal = snapshot.data!
+                                                      .elementAt(index)
+                                                      .data['duration'];
+                                                  context
+                                                      .read<AudioplayerCubit>()
+                                                      .update(audioPath, snapshot.data!
+                                                      .elementAt(index)
+                                                      .id,
+                                                          durationTotal, true);
+                                                });
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                primary: state.sourceName == snapshot.data!.elementAt(index).id ? Colors.green :Colors.blue), 
+                                              
+                                              child: Text(snapshot.data!
+                                                  .elementAt(index)
+                                                  .id),
+                                            ));
+                                      },
+                                    ));
+                              }
+                              if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              }
+                              
+                              return Container();
+                            })
+                      ],
+                    ),
+                ])
                 : AudioRecorder(
                     onStop: (path, duration) {
                       if (kDebugMode) print('Recorded file path: ');
@@ -213,7 +260,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                         durationTotal = duration;
                         context
                             .read<AudioplayerCubit>()
-                            .update(audioPath, durationTotal, false);
+                            .update(audioPath,'Audio Grabado', durationTotal, false);
                       });
                     },
                   ),

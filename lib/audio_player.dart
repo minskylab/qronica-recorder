@@ -11,6 +11,7 @@ class AudioPlayer extends StatefulWidget {
   late String source;
   late int duration;
   late bool newAudio;
+  late String option;
 
   /// Callback when audio file should be removed
   /// Setting this to null hides the delete button
@@ -22,6 +23,7 @@ class AudioPlayer extends StatefulWidget {
     required this.duration,
     required this.newAudio,
     required this.onDelete,
+    required this.option,
   }) : super(key: key);
 
   @override
@@ -164,7 +166,8 @@ class AudioPlayerState extends State<AudioPlayer> {
                 },
               ),
               IconButton(
-              icon: const Icon(Icons.delete,
+              icon: Icon(
+                widget.option == "back" ? Icons.arrow_back_ios_new_sharp:Icons.delete,
                   color: Color(0xFF73748D), size: 24),
               onPressed: () {
                 pause();

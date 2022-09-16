@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:qronica_recorder/local_storage.dart';
 import 'package:qronica_recorder/pocketbase.dart';
+import 'package:universal_html/html.dart';
 
 class StorageService {
   Position? position;
@@ -38,11 +39,28 @@ class StorageService {
     String path,
     String fileName,
     int duration,
+    List<String> projectIds,
   ) async {
     await getCurrentPosition();
     Uri myUri = Uri.parse(path);
     final http.Response responseData = await http.get(myUri);
     final uint8list = responseData.bodyBytes;
+    String geolocationJson = '''{
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              ${position!.latitude},
+              ${position!.longitude}
+            ]
+          }
+        }
+      ]
+    }''';
     if (PocketBaseSample.client.authStore.isValid == false)
     {
       PocketBaseSample.client.authStore.save(LocalStorageHelper.getValue('token')!, UserModel);
@@ -51,6 +69,10 @@ class StorageService {
     body: {
     'name': LocalStorageHelper.getValue('userId'),
     'kind': 'sound',
+    'duration' : duration,
+    'geolocation' : geolocationJson,
+    'projects': projectIds[0],
+
     },
     files:[
       http.MultipartFile.fromBytes(
