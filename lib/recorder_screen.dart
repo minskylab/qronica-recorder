@@ -124,8 +124,6 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                 if (state.uploaded == StatusAudioUpload.yet) {
                                   return Column(
                                     children: [
-                                    Text("Opciones de guardado"),
-                                    Text("Seleccionar los proyectos a vincular:"),
                                     FutureBuilder(
                                       future: storage.listProjects(),
                                       builder: (BuildContext context,
@@ -139,24 +137,29 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                             for(int i = 0; i < data!.length; i++) {
                                               names.add(data.elementAt(i).data['name']);
                                               ids.add(data.elementAt(i).id);
-                                            }
-                                        return Padding(
-                                          padding: const EdgeInsets.only(left: 500, right: 500),
-                                          child: CustomCheckBoxGroup(
-                                            buttonLables: names,
-                                            buttonValuesList: ids,
-                                            checkBoxButtonValues: (values) {
-                                                  for(int i = 0; i < values.length; i++) {
-                                                    projectIds.add(values[i].toString());
-                                                  } 
-                                              print(values);
-                                              },
-                                            horizontal: true,
-                                            width: 50,
-                                            selectedColor: Colors.blue,
-                                            padding: 5, unSelectedColor: Colors.white,
-                                          ),
+                                                                                      return Column(
+                                          children: [
+                                            Text("Opciones de guardado"),
+                                            Text("Seleccionar los proyectos a vincular:"),
+                                            Padding(
+                                            padding: const EdgeInsets.only(left: 500, right: 500),
+                                            child: CustomCheckBoxGroup(
+                                              buttonLables: names,
+                                              buttonValuesList: ids,
+                                              checkBoxButtonValues: (values) {
+                                                    for(int i = 0; i < values.length; i++) {
+                                                      projectIds.add(values[i].toString());
+                                                    } 
+                                                print(values);
+                                                },
+                                              horizontal: true,
+                                              width: 50,
+                                              selectedColor: Colors.blue,
+                                              padding: 5, unSelectedColor: Colors.white,
+                                            ),
+                                          )],
                                         );
+                                            }
                                         }
                                         if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
@@ -202,8 +205,6 @@ class _RecorderScreenState extends State<RecorderScreen> {
                         //  }
                         //  }
                         //),
-                        Text("Audios guardados",
-                                    style: TextStyle(height:5, fontSize:15),),
                         FutureBuilder(
                             future: storage.listFiles(),
                             builder: (BuildContext context,
@@ -218,35 +219,40 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                       itemCount: snapshot.data!.length,
                                       itemBuilder:
                                           (BuildContext context, int index) {
-                                        return Padding(
-                                            padding: EdgeInsets.all(10),
-                                            child: ElevatedButton(
-                                                onPressed: () async {
-                                                final url =
-                                                    'http://127.0.0.1:8090/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
-                                                setState(() {
-                                                  audioPath = url;
-                                                  durationTotal = snapshot.data!
-                                                      .elementAt(index)
-                                                      .data['duration'];
-                                                  context
-                                                      .read<AudioplayerCubit>()
-                                                      .notsaved(); //cambiar metodoo
-                                                  context
-                                                      .read<AudioplayerCubit>()
-                                                      .update(audioPath, snapshot.data!
-                                                      .elementAt(index)
-                                                      .id,
-                                                          durationTotal, true);
-                                                });
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                primary: state.sourceName == snapshot.data!.elementAt(index).id ? Colors.green :Colors.blue), 
-                                              
-                                              child: Text(snapshot.data!
-                                                  .elementAt(index)
-                                                  .id),
-                                            ));
+                                        return Column(
+                                          children:[ 
+                                           Text("Audios guardados",
+                                             style: TextStyle(height:5, fontSize:15),),
+                                            Padding(
+                                              padding: EdgeInsets.all(10),
+                                              child: ElevatedButton(
+                                                  onPressed: () async {
+                                                  final url =
+                                                      'http://127.0.0.1:8090/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
+                                                  setState(() {
+                                                    audioPath = url;
+                                                    durationTotal = snapshot.data!
+                                                        .elementAt(index)
+                                                        .data['duration'];
+                                                    context
+                                                        .read<AudioplayerCubit>()
+                                                        .notsaved(); //cambiar metodoo
+                                                    context
+                                                        .read<AudioplayerCubit>()
+                                                        .update(audioPath, snapshot.data!
+                                                        .elementAt(index)
+                                                        .id,
+                                                            durationTotal, true);
+                                                  });
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: state.sourceName == snapshot.data!.elementAt(index).id ? Colors.green :Colors.blue), 
+                                                
+                                                child: Text(snapshot.data!
+                                                    .elementAt(index)
+                                                    .id),
+                                              ))],
+                                        );
                                       },
                                     ));
                               }
