@@ -71,7 +71,7 @@ class StorageService {
     'kind': 'sound',
     'duration' : duration,
     'geolocation' : geolocationJson,
-    'projects': projectIds[0],
+    //'projects': projectIds[0],
 
     },
     files:[

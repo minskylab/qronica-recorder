@@ -62,7 +62,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                 BlocBuilder<AudioplayerCubit, AudioplayerState>(
                                     builder: ((context, state) {
                               if (state.status == StatusAudioPlayer.ready) {
-                                if (state.uploaded == StatusAudioUpload.done) {
+                                if (state.uploaded == StatusAudioUpload.done ||state.uploaded == StatusAudioUpload.unsaved) {
                                   return Column(
                                   children: [
                                     Text("Reproduciendo audio: ${state.sourceName}",
@@ -178,8 +178,12 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                 } else if (state.uploaded ==
                                     StatusAudioUpload.inProgress) {
                                   return const CircularProgressIndicator();
-                                } else {
+                                } else if (state.uploaded ==
+                                    StatusAudioUpload.done){
                                   return const Text("Guardado");
+                                }
+                                else {
+                                  return Container();
                                 }
                               }),
                             )),
@@ -198,6 +202,8 @@ class _RecorderScreenState extends State<RecorderScreen> {
                         //  }
                         //  }
                         //),
+                        Text("Audios guardados",
+                                    style: TextStyle(height:5, fontSize:15),),
                         FutureBuilder(
                             future: storage.listFiles(),
                             builder: (BuildContext context,
@@ -223,6 +229,9 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                                   durationTotal = snapshot.data!
                                                       .elementAt(index)
                                                       .data['duration'];
+                                                  context
+                                                      .read<AudioplayerCubit>()
+                                                      .notsaved(); //cambiar metodoo
                                                   context
                                                       .read<AudioplayerCubit>()
                                                       .update(audioPath, snapshot.data!

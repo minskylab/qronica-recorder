@@ -1,7 +1,7 @@
 part of 'audioplayer_cubit.dart';
 
 enum StatusAudioPlayer { ready , loading , failed, changed}
-enum StatusAudioUpload { yet, done, inProgress }
+enum StatusAudioUpload { yet, done, inProgress, unsaved }
 
 
 class AudioplayerState extends Equatable {

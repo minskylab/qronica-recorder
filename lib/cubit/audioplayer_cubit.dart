@@ -47,4 +47,12 @@ class AudioplayerCubit extends Cubit<AudioplayerState> {
       ),
     );
   }
+
+  void notsaved() {
+                emit(
+      state.copyWith(
+        uploaded: StatusAudioUpload.unsaved,
+      ),
+    );
+  }
 }
