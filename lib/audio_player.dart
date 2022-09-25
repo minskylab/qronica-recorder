@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'package:just_audio/just_audio.dart' as ja; 
+import 'package:just_audio/just_audio.dart' as ja;
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-
 
 class AudioPlayer extends StatefulWidget {
   /// Path from where to play recorded audio
@@ -28,8 +27,6 @@ class AudioPlayer extends StatefulWidget {
 
   @override
   AudioPlayerState createState() => AudioPlayerState();
-
-
 }
 
 class AudioPlayerState extends State<AudioPlayer> {
@@ -41,13 +38,12 @@ class AudioPlayerState extends State<AudioPlayer> {
     ),
   );
   final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
-  final _audioPlayer = ja.AudioPlayer();                   // Create a player
+  final _audioPlayer = ja.AudioPlayer(); // Create a player
 
   @override
   void initState() {
     super.initState();
     _init();
-
   }
 
   @override
@@ -55,7 +51,6 @@ class AudioPlayerState extends State<AudioPlayer> {
     _audioPlayer.dispose();
     super.dispose();
   }
-
 
   void _init() async {
     print('llamando}');
@@ -99,7 +94,7 @@ class AudioPlayerState extends State<AudioPlayer> {
       progressNotifier.value = ProgressBarState(
         current: oldState.current,
         buffered: oldState.buffered,
-        total: Duration(milliseconds:widget.duration),
+        total: Duration(milliseconds: widget.duration),
       );
     });
   }
@@ -108,7 +103,7 @@ class AudioPlayerState extends State<AudioPlayer> {
     print("widgets audio:${widget.newAudio}");
     print("widgets source:${widget.source}");
     if (widget.newAudio == true) {
-    await _audioPlayer.setUrl(widget.source);
+      await _audioPlayer.setUrl(widget.source);
       widget.newAudio = false;
     }
     _audioPlayer.play();
@@ -122,61 +117,64 @@ class AudioPlayerState extends State<AudioPlayer> {
     _audioPlayer.seek(position);
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              ValueListenableBuilder<ProgressBarState>(
-                valueListenable: progressNotifier,
-                builder: (_, value, __) {
-                  return ProgressBar(
-                    progress: value.current,
-                    buffered: value.buffered,
-                    total: value.total,
-                    onSeek: seek,
-                  );
-                },
-              ),
-              ValueListenableBuilder<ButtonState>(
-                valueListenable: buttonNotifier,
-                builder: (_, value, __) {
-                  switch (value) {
-                    case ButtonState.loading:
-                      return Container(
-                        margin: const EdgeInsets.all(8.0),
-                        width: 32.0,
-                        height: 32.0,
-                        child: const CircularProgressIndicator(),
-                      );
-                    case ButtonState.paused:
-                      return IconButton(
-                        icon: const Icon(Icons.play_arrow),
-                        iconSize: 32.0,
-                        onPressed: play,
-                      );
-                    case ButtonState.playing:
-                      return IconButton(
-                        icon: const Icon(Icons.pause),
-                        iconSize: 32.0,
-                        onPressed:pause,
-                      );
-                  }
-                },
-              ),
-              IconButton(
-              icon: Icon(
-                widget.option == "back" ? Icons.arrow_back_ios_new_sharp:Icons.delete,
-                  color: Color(0xFF73748D), size: 24),
-              onPressed: () {
-                pause();
-                widget.onDelete();
-              },
-            ),
-            ],
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        children: [
+          ValueListenableBuilder<ProgressBarState>(
+            valueListenable: progressNotifier,
+            builder: (_, value, __) {
+              return ProgressBar(
+                progress: value.current,
+                buffered: value.buffered,
+                total: value.total,
+                onSeek: seek,
+              );
+            },
           ),
-        );
+          ValueListenableBuilder<ButtonState>(
+            valueListenable: buttonNotifier,
+            builder: (_, value, __) {
+              switch (value) {
+                case ButtonState.loading:
+                  return Container(
+                    margin: const EdgeInsets.all(8.0),
+                    width: 32.0,
+                    height: 32.0,
+                    child: const CircularProgressIndicator(),
+                  );
+                case ButtonState.paused:
+                  return IconButton(
+                    icon: const Icon(Icons.play_arrow),
+                    iconSize: 32.0,
+                    onPressed: play,
+                  );
+                case ButtonState.playing:
+                  return IconButton(
+                    icon: const Icon(Icons.pause),
+                    iconSize: 32.0,
+                    onPressed: pause,
+                  );
+              }
+            },
+          ),
+          IconButton(
+            icon: Icon(
+                widget.option == "back"
+                    ? Icons.arrow_back_ios_new_sharp
+                    : Icons.delete,
+                color: Color(0xFF73748D),
+                size: 24),
+            onPressed: () {
+              pause();
+              widget.onDelete();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
 
