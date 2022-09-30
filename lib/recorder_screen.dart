@@ -33,7 +33,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
   }
 
   Future<void> asyncUpload(BuildContext context, VoidCallback onSuccess) async {
-        setState(() {
+    setState(() {
       context.read<AudioplayerCubit>().uploading();
     });
     final path = audioPath;
@@ -52,45 +52,53 @@ class _RecorderScreenState extends State<RecorderScreen> {
         builder: (context, state) {
           return Center(
             child: showPlayer
-                ? ListView(
-                  children:[ Column(
+                ? ListView(children: [
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 25, vertical: 15),
                             child:
                                 BlocBuilder<AudioplayerCubit, AudioplayerState>(
                                     builder: ((context, state) {
                               if (state.status == StatusAudioPlayer.ready) {
-                                if (state.uploaded == StatusAudioUpload.done ||state.uploaded == StatusAudioUpload.unsaved) {
+                                if (state.uploaded == StatusAudioUpload.done ||
+                                    state.uploaded ==
+                                        StatusAudioUpload.unsaved) {
                                   return Column(
-                                  children: [
-                                    Text("Reproduciendo audio: ${state.sourceName}",
-                                    style: TextStyle(height:5, fontSize:20),),
-                                    Text("Audio: ${state.source}"),
-                                    Text("Duration: ${state.duration}"),
-                                    Text("New audio: ${state.newAudio}"),
-                                    AudioPlayer(
-                                      source: state.source!,
-                                      duration: state.duration!,
-                                      newAudio: state.newAudio!,
-                                      option: 'back',
-                                      onDelete: () {
-                                        setState(() {
-                                      context.read<AudioplayerCubit>().notUploaded();
-                                          showPlayer = false;
-                                          })
-                                        ;
-                                        
-                                      },
-                                    ),
-                                  ],
-                                );
-                              }
+                                    children: [
+                                      Text(
+                                        "Reproduciendo audio: ${state.sourceName}",
+                                        style:
+                                            TextStyle(height: 5, fontSize: 20),
+                                      ),
+                                      Text("Audio: ${state.source}"),
+                                      Text("Duration: ${state.duration}"),
+                                      Text("New audio: ${state.newAudio}"),
+                                      AudioPlayer(
+                                        source: state.source!,
+                                        duration: state.duration!,
+                                        newAudio: state.newAudio!,
+                                        option: 'back',
+                                        onDelete: () {
+                                          setState(() {
+                                            context
+                                                .read<AudioplayerCubit>()
+                                                .notUploaded();
+                                            showPlayer = false;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }
                                 return Column(
                                   children: [
-                                    Text("Reproduciendo audio: ${state.sourceName}",
-                                    style: TextStyle(height:5, fontSize:20),),
+                                    Text(
+                                      "Reproduciendo audio: ${state.sourceName}",
+                                      style: TextStyle(height: 5, fontSize: 20),
+                                    ),
                                     Text("Audio: ${state.source}"),
                                     Text("Duration: ${state.duration}"),
                                     Text("New audio: ${state.newAudio}"),
@@ -98,21 +106,19 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                       source: state.source!,
                                       duration: state.duration!,
                                       newAudio: state.newAudio!,
-                                      option:'new',
+                                      option: 'new',
                                       onDelete: () {
                                         setState(() {
-                                      context.read<AudioplayerCubit>().notUploaded();
+                                          context
+                                              .read<AudioplayerCubit>()
+                                              .notUploaded();
                                           showPlayer = false;
-                                          })
-                                        ;
-                                        
+                                        });
                                       },
                                     ),
                                   ],
                                 );
-                              }
-                    
-                              else {
+                              } else {
                                 return CircularProgressIndicator();
                               }
                             }))),
@@ -124,68 +130,87 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                 if (state.uploaded == StatusAudioUpload.yet) {
                                   return Column(
                                     children: [
-                                    FutureBuilder(
-                                      future: storage.listProjects(),
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot<List<RecordModel>> snapshot) {
-                                        if (snapshot.connectionState ==
-                                                ConnectionState.done &&
-                                            snapshot.hasData) {
-                                            var data = snapshot.data;
-                                            final names = <String>[];
-                                            final ids = <String>[];
-                                            for(int i = 0; i < data!.length; i++) {
-                                              names.add(data.elementAt(i).data['name']);
-                                              ids.add(data.elementAt(i).id);
-                                                                                      return Column(
-                                          children: [
-                                            Text("Opciones de guardado"),
-                                            Text("Seleccionar los proyectos a vincular:"),
-                                            Padding(
-                                            padding: const EdgeInsets.only(left: 500, right: 500),
-                                            child: CustomCheckBoxGroup(
-                                              buttonLables: names,
-                                              buttonValuesList: ids,
-                                              checkBoxButtonValues: (values) {
-                                                    for(int i = 0; i < values.length; i++) {
-                                                      projectIds.add(values[i].toString());
-                                                    } 
-                                                print(values);
-                                                },
-                                              horizontal: true,
-                                              width: 50,
-                                              selectedColor: Colors.blue,
-                                              padding: 5, unSelectedColor: Colors.white,
-                                            ),
-                                          )],
-                                        );
+                                      FutureBuilder(
+                                          future: storage.listProjects(),
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot<List<RecordModel>>
+                                                  snapshot) {
+                                            if (snapshot.connectionState ==
+                                                    ConnectionState.done &&
+                                                snapshot.hasData) {
+                                              var data = snapshot.data;
+                                              final names = <String>[];
+                                              final ids = <String>[];
+                                              for (int i = 0;
+                                                  i < data!.length;
+                                                  i++) {
+                                                names.add(data
+                                                    .elementAt(i)
+                                                    .data['name']);
+                                                ids.add(data.elementAt(i).id);
+                                                return Column(
+                                                  children: [
+                                                    Text(
+                                                        "Opciones de guardado"),
+                                                    Text(
+                                                        "Seleccionar los proyectos a vincular:"),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 500,
+                                                              right: 500),
+                                                      child:
+                                                          CustomCheckBoxGroup(
+                                                        buttonLables: names,
+                                                        buttonValuesList: ids,
+                                                        checkBoxButtonValues:
+                                                            (values) {
+                                                          for (int i = 0;
+                                                              i < values.length;
+                                                              i++) {
+                                                            projectIds.add(
+                                                                values[i]
+                                                                    .toString());
+                                                          }
+                                                          print(values);
+                                                        },
+                                                        horizontal: true,
+                                                        width: 50,
+                                                        selectedColor:
+                                                            Colors.blue,
+                                                        padding: 5,
+                                                        unSelectedColor:
+                                                            Colors.white,
+                                                      ),
+                                                    )
+                                                  ],
+                                                );
+                                              }
                                             }
-                                        }
-                                        if (snapshot.connectionState ==
+                                            if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
-                                          return const CircularProgressIndicator();
-                                        }
-                                        
-                                        return Container();
-                                      })
-                                      ,
-                                      ElevatedButton(
-                                      onPressed: () => asyncUpload(context, () {
-                                            context
-                                                .read<AudioplayerCubit>()
-                                                .uploaded();
+                                              return const CircularProgressIndicator();
+                                            }
+
+                                            return Container();
                                           }),
-                                      child: const Text("Guardar audio"))
+                                      ElevatedButton(
+                                          onPressed: () =>
+                                              asyncUpload(context, () {
+                                                context
+                                                    .read<AudioplayerCubit>()
+                                                    .uploaded();
+                                              }),
+                                          child: const Text("Guardar audio"))
                                     ],
                                   );
                                 } else if (state.uploaded ==
                                     StatusAudioUpload.inProgress) {
                                   return const CircularProgressIndicator();
                                 } else if (state.uploaded ==
-                                    StatusAudioUpload.done){
+                                    StatusAudioUpload.done) {
                                   return const Text("Guardado");
-                                }
-                                else {
+                                } else {
                                   return Container();
                                 }
                               }),
@@ -220,52 +245,69 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                       itemBuilder:
                                           (BuildContext context, int index) {
                                         return Column(
-                                          children:[ 
-                                           Text("Audios guardados",
-                                             style: TextStyle(height:5, fontSize:15),),
+                                          children: [
+                                            Text(
+                                              "Audios guardados",
+                                              style: TextStyle(
+                                                  height: 5, fontSize: 15),
+                                            ),
                                             Padding(
-                                              padding: EdgeInsets.all(10),
-                                              child: ElevatedButton(
+                                                padding: EdgeInsets.all(10),
+                                                child: ElevatedButton(
                                                   onPressed: () async {
-                                                  final url =
-                                                      'http://127.0.0.1:8090/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
-                                                  setState(() {
-                                                    audioPath = url;
-                                                    durationTotal = snapshot.data!
-                                                        .elementAt(index)
-                                                        .data['duration'];
-                                                    context
-                                                        .read<AudioplayerCubit>()
-                                                        .notsaved(); //cambiar metodoo
-                                                    context
-                                                        .read<AudioplayerCubit>()
-                                                        .update(audioPath, snapshot.data!
-                                                        .elementAt(index)
-                                                        .id,
-                                                            durationTotal, true);
-                                                  });
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: state.sourceName == snapshot.data!.elementAt(index).id ? Colors.green :Colors.blue), 
-                                                
-                                                child: Text(snapshot.data!
-                                                    .elementAt(index)
-                                                    .id),
-                                              ))],
+                                                    final url =
+                                                        'http://127.0.0.1:8090/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
+                                                    setState(() {
+                                                      audioPath = url;
+                                                      durationTotal = snapshot
+                                                          .data!
+                                                          .elementAt(index)
+                                                          .data['duration'];
+                                                      context
+                                                          .read<
+                                                              AudioplayerCubit>()
+                                                          .notsaved(); //cambiar metodoo
+                                                      context
+                                                          .read<
+                                                              AudioplayerCubit>()
+                                                          .update(
+                                                              audioPath,
+                                                              snapshot.data!
+                                                                  .elementAt(
+                                                                      index)
+                                                                  .id,
+                                                              durationTotal,
+                                                              true);
+                                                    });
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                      primary: state
+                                                                  .sourceName ==
+                                                              snapshot.data!
+                                                                  .elementAt(
+                                                                      index)
+                                                                  .id
+                                                          ? Colors.green
+                                                          : Colors.blue),
+                                                  child: Text(snapshot.data!
+                                                      .elementAt(index)
+                                                      .id),
+                                                ))
+                                          ],
                                         );
                                       },
                                     ));
                               }
                               if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
+                                  ConnectionState.waiting) {
                                 return const CircularProgressIndicator();
                               }
-                              
+
                               return Container();
                             })
                       ],
                     ),
-                ])
+                  ])
                 : AudioRecorder(
                     onStop: (path, duration) {
                       if (kDebugMode) print('Recorded file path: ');
@@ -273,9 +315,8 @@ class _RecorderScreenState extends State<RecorderScreen> {
                         audioPath = path;
                         showPlayer = true;
                         durationTotal = duration;
-                        context
-                            .read<AudioplayerCubit>()
-                            .update(audioPath,'Audio Grabado', durationTotal, false);
+                        context.read<AudioplayerCubit>().update(
+                            audioPath, 'Audio Grabado', durationTotal, false);
                       });
                     },
                   ),

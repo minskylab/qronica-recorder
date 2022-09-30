@@ -16,23 +16,22 @@ class StorageService {
   Position? position;
 
   Future<void> getCurrentPosition() async {
-    Position currentposition = await getLocationwithPermission();
-    position = currentposition;
+    Position currentPosition = await getLocationWithPermission();
+    position = currentPosition;
   }
 
-  Future<Position> getLocationwithPermission() async {
+  Future<Position> getLocationWithPermission() async {
     LocationPermission permission;
     permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied)
-    {
+    if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         return Future.error('Location Permissions are denied');
       }
     }
 
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
 
   Future<void> uploadAudio(
@@ -45,7 +44,7 @@ class StorageService {
     Uri myUri = Uri.parse(path);
     final http.Response responseData = await http.get(myUri);
     final uint8list = responseData.bodyBytes;
-    String geolocationJson = '''{
+    String locationJSON = '''{
       "type": "FeatureCollection",
       "features": [
         {
@@ -61,48 +60,50 @@ class StorageService {
         }
       ]
     }''';
-    if (PocketBaseSample.client.authStore.isValid == false)
-    {
-      PocketBaseSample.client.authStore.save(LocalStorageHelper.getValue('token')!, UserModel);
+    if (PocketBaseSample.client.authStore.isValid == false) {
+      PocketBaseSample.client.authStore
+          .save(LocalStorageHelper.getValue('token')!, UserModel);
     }
-    final record = await PocketBaseSample.client.records.create('resources', 
-    body: {
-    'name': LocalStorageHelper.getValue('userId'),
-    'kind': 'sound',
-    'duration' : duration,
-    'geolocation' : geolocationJson,
-    //'projects': projectIds[0],
-
-    },
-    files:[
-      http.MultipartFile.fromBytes(
-        'file', // the name of the file field
-        uint8list,
-        filename: 'audio.blob',
-      )
-    ],
+    final record = await PocketBaseSample.client.records.create(
+      'resources',
+      body: {
+        'name': LocalStorageHelper.getValue('userId'),
+        'kind': 'sound',
+        'metadata': '''{"duration": $duration}''',
+        'location': locationJSON,
+        //'projects': projectIds[0],
+      },
+      files: [
+        http.MultipartFile.fromBytes(
+          'file', // the name of the file field
+          uint8list,
+          filename: 'audio.blob',
+        )
+      ],
     );
   }
 
   Future<List<RecordModel>> listFiles() async {
-    final records = await PocketBaseSample.client.records.getFullList('resources', batch: 200, sort: '-created');
+    final records = await PocketBaseSample.client.records
+        .getFullList('resources', batch: 200, sort: '-created');
     print(records);
     return records;
   }
+
   Stream<RecordModel?> getRecord() async* {
     late RecordModel? prueba;
     final client = PocketBase('http://127.0.0.1:8090');
     client.users.authViaEmail('a@q.com', 'julian29');
     client.realtime.subscribe('resources', (e) {
-    print(e.record);
-    prueba = e.record;
+      print(e.record);
+      prueba = e.record;
     });
     yield prueba;
   }
 
   Future<List<RecordModel>> listProjects() async {
-    final projects = await PocketBaseSample.client.records.getFullList('projects', batch: 200, sort: '-created');
+    final projects = await PocketBaseSample.client.records
+        .getFullList('projects', batch: 200, sort: '-created');
     return projects;
   }
-
 }
