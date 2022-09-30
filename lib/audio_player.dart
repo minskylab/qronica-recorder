@@ -42,6 +42,20 @@ class AudioPlayerState extends State<AudioPlayer> {
   );
   final buttonNotifier = ValueNotifier<ButtonState>(ButtonState.paused);
   final _audioPlayer = ja.AudioPlayer();                   // Create a player
+  late ConcatenatingAudioSource _playlist;
+
+//  void _setInitialPlaylist() async {
+//  const prefix = 'https://www.soundhelix.com/examples/mp3';
+//  final song1 = Uri.parse('$prefix/SoundHelix-Song-1.mp3');
+//  final song2 = Uri.parse('$prefix/SoundHelix-Song-2.mp3');
+//  final song3 = Uri.parse('$prefix/SoundHelix-Song-3.mp3');
+//  _playlist = ConcatenatingAudioSource(children: [
+//    AudioSource.uri(song1, tag: 'Song 1'),
+//    AudioSource.uri(song2, tag: 'Song 2'),
+//    AudioSource.uri(song3, tag: 'Song 3'),
+//  ]);
+//  await _audioPlayer.setAudioSource(_playlist);
+//}
 
   @override
   void initState() {
@@ -59,6 +73,12 @@ class AudioPlayerState extends State<AudioPlayer> {
 
   void _init() async {
     print('llamando}');
+    if (widget.newAudio == true) {
+      _audioPlayer.seek(Duration.zero);
+      _audioPlayer.pause();
+      await _audioPlayer.setUrl(widget.source);
+      widget.newAudio = false;
+    }
     await _audioPlayer.setUrl(widget.source);
     _audioPlayer.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
@@ -105,13 +125,9 @@ class AudioPlayerState extends State<AudioPlayer> {
   }
 
   void play() async {
-    print("widgets audio:${widget.newAudio}");
-    print("widgets source:${widget.source}");
-    if (widget.newAudio == true) {
-    await _audioPlayer.setUrl(widget.source);
-      widget.newAudio = false;
-    }
     _audioPlayer.play();
+
+    
   }
 
   void pause() {
