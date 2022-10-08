@@ -73,12 +73,6 @@ class AudioPlayerState extends State<AudioPlayer> {
 
   void _init() async {
     print('llamando}');
-    if (widget.newAudio == true) {
-      _audioPlayer.seek(Duration.zero);
-      _audioPlayer.pause();
-      await _audioPlayer.setUrl(widget.source);
-      widget.newAudio = false;
-    }
     await _audioPlayer.setUrl(widget.source);
     _audioPlayer.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
@@ -125,6 +119,12 @@ class AudioPlayerState extends State<AudioPlayer> {
   }
 
   void play() async {
+    if (widget.newAudio == true) {
+      _audioPlayer.seek(Duration.zero);
+      _audioPlayer.pause();
+      await _audioPlayer.setUrl(widget.source);
+      widget.newAudio = false;
+    }
     _audioPlayer.play();
 
     
