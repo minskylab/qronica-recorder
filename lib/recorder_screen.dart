@@ -230,6 +230,11 @@ class _RecorderScreenState extends State<RecorderScreen> {
                         //  }
                         //  }
                         //),
+                        const Text(
+                          "Audios guardados",
+                          style: TextStyle(
+                              height: 5, fontSize: 15),
+                        ),
                         FutureBuilder(
                             future: storage.listFiles(),
                             builder: (BuildContext context,
@@ -246,11 +251,6 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                           (BuildContext context, int index) {
                                         return Column(
                                           children: [
-                                            Text(
-                                              "Audios guardados",
-                                              style: TextStyle(
-                                                  height: 5, fontSize: 15),
-                                            ),
                                             Padding(
                                                 padding: EdgeInsets.all(10),
                                                 child: ElevatedButton(
@@ -258,11 +258,15 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                                     final url =
                                                         'http://127.0.0.1:8090/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
                                                     setState(() {
+                                                      print(snapshot
+                                                          .data!
+                                                          .elementAt(index)
+                                                          .data['metadata']);
                                                       audioPath = url;
                                                       durationTotal = snapshot
                                                           .data!
                                                           .elementAt(index)
-                                                          .data['duration'];
+                                                          .data['metadata']['duration'];
                                                       context
                                                           .read<
                                                               AudioplayerCubit>()
