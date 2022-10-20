@@ -51,6 +51,8 @@ class LoginCubit extends Cubit<LoginState> {
       LocalStorageHelper.saveValue('loggedIn', 'true');
       LocalStorageHelper.saveValue('token',authData.token);
       LocalStorageHelper.saveValue('userId',authData.user!.id);
+      LocalStorageHelper.saveValue('email',state.emailAddress!);
+      LocalStorageHelper.saveValue('password',state.password!);
       PocketBaseSample.client.authStore.save(authData.token, authData.user);
 
       emit(

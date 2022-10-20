@@ -57,7 +57,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 horizontal: 25, vertical: 15),
                             child:
                                 BlocBuilder<AudioplayerCubit, AudioplayerState>(
@@ -71,7 +71,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                       Text(
                                         "Reproduciendo audio: ${state.sourceName}",
                                         style:
-                                            TextStyle(height: 5, fontSize: 20),
+                                            const TextStyle(height: 5, fontSize: 20),
                                       ),
                                       Text("Audio: ${state.source}"),
                                       Text("Duration: ${state.duration}"),
@@ -97,7 +97,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                   children: [
                                     Text(
                                       "Reproduciendo audio: ${state.sourceName}",
-                                      style: TextStyle(height: 5, fontSize: 20),
+                                      style: const TextStyle(height: 5, fontSize: 20),
                                     ),
                                     Text("Audio: ${state.source}"),
                                     Text("Duration: ${state.duration}"),
@@ -119,7 +119,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                   ],
                                 );
                               } else {
-                                return CircularProgressIndicator();
+                                return const CircularProgressIndicator();
                               }
                             }))),
                         Padding(
@@ -150,9 +150,9 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                                 ids.add(data.elementAt(i).id);
                                                 return Column(
                                                   children: [
-                                                    Text(
+                                                    const Text(
                                                         "Opciones de guardado"),
-                                                    Text(
+                                                    const Text(
                                                         "Seleccionar los proyectos a vincular:"),
                                                     Padding(
                                                       padding:
@@ -172,7 +172,6 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                                                 values[i]
                                                                     .toString());
                                                           }
-                                                          print(values);
                                                         },
                                                         horizontal: true,
                                                         width: 50,
@@ -194,6 +193,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
 
                                             return Container();
                                           }),
+                                      const SizedBox(height:20.0),
                                       ElevatedButton(
                                           onPressed: () =>
                                               asyncUpload(context, () {
@@ -252,16 +252,12 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                         return Column(
                                           children: [
                                             Padding(
-                                                padding: EdgeInsets.all(10),
+                                                padding: const EdgeInsets.all(10),
                                                 child: ElevatedButton(
                                                   onPressed: () async {
                                                     final url =
-                                                        'http://127.0.0.1:8090/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
+                                                        '${PocketBaseSample.url}/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
                                                     setState(() {
-                                                      print(snapshot
-                                                          .data!
-                                                          .elementAt(index)
-                                                          .data['metadata']);
                                                       audioPath = url;
                                                       durationTotal = snapshot
                                                           .data!

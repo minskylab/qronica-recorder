@@ -84,24 +84,27 @@ class StorageService {
   }
 
   Future<List<RecordModel>> listFiles() async {
+    final authData = await 
+    PocketBaseSample.client.users.authViaEmail(LocalStorageHelper.getValue('email')!,LocalStorageHelper.getValue('password')!);
     final records = await PocketBaseSample.client.records
         .getFullList('resources', batch: 200, sort: '-created');
-    print(records);
     return records;
   }
 
-  Stream<RecordModel?> getRecord() async* {
-    late RecordModel? prueba;
-    final client = PocketBase('http://127.0.0.1:8090');
-    client.users.authViaEmail('a@q.com', 'julian29');
-    client.realtime.subscribe('resources', (e) {
-      print(e.record);
-      prueba = e.record;
-    });
-    yield prueba;
-  }
+  //Stream<RecordModel?> getRecord() async* {
+  //  late RecordModel? prueba;
+  //  final client = PocketBase('http://127.0.0.1:8090');
+  //  client.users.authViaEmail('a@q.com', 'julian29');
+  //  client.realtime.subscribe('resources', (e) {
+  //    print(e.record);
+  //    prueba = e.record;
+  //  });
+  //  yield prueba;
+  //}
 
   Future<List<RecordModel>> listProjects() async {
+    final authData = await 
+    PocketBaseSample.client.users.authViaEmail(LocalStorageHelper.getValue('email')!,LocalStorageHelper.getValue('password')!);
     final projects = await PocketBaseSample.client.records
         .getFullList('projects', batch: 200, sort: '-created');
     return projects;
