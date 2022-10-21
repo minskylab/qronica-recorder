@@ -7,8 +7,8 @@ class LocalStorageHelper {
     localStorage[key] = value;
   }
 
-  static String? getValue(String key) {
-    return localStorage[key];
+  static String getValue(String key, {String defaultValue = ''}) {
+    return localStorage[key] ?? defaultValue;
   }
 
   static void removeValue(String key) {
