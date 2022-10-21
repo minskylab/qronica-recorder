@@ -147,7 +147,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                                 names.add(data
                                                     .elementAt(i)
                                                     .data['name']);
-                                                ids.add(data.elementAt(i).id);
+                                                ids.add(data.elementAt(i).id);}
                                                 return Column(
                                                   children: [
                                                     const Text(
@@ -184,7 +184,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                                     )
                                                   ],
                                                 );
-                                              }
+                                              
                                             }
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
