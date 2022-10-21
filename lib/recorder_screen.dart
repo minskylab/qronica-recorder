@@ -123,7 +123,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                               }
                             }))),
                         Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
+                            padding: const EdgeInsets.symmetric(horizontal: 60),
                             child:
                                 BlocBuilder<AudioplayerCubit, AudioplayerState>(
                               builder: ((context, state) {
@@ -154,32 +154,39 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                                         "Opciones de guardado"),
                                                     const Text(
                                                         "Seleccionar los proyectos a vincular:"),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 500,
-                                                              right: 500),
-                                                      child:
-                                                          CustomCheckBoxGroup(
-                                                        buttonLables: names,
-                                                        buttonValuesList: ids,
-                                                        checkBoxButtonValues:
-                                                            (values) {
-                                                          for (int i = 0;
-                                                              i < values.length;
-                                                              i++) {
-                                                            projectIds.add(
-                                                                values[i]
-                                                                    .toString());
-                                                          }
-                                                        },
-                                                        horizontal: true,
-                                                        width: 50,
-                                                        selectedColor:
-                                                            Colors.blue,
-                                                        padding: 5,
-                                                        unSelectedColor:
-                                                            Colors.white,
+                                                    Container(
+                                                      width: 200,
+                                                      child: Column(
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets.only(
+                                                                    left: 5,
+                                                                    right: 5),
+                                                            child:
+                                                              CustomCheckBoxGroup(
+                                                              width: 10,
+                                                              buttonLables: names,
+                                                              buttonValuesList: ids,
+                                                              checkBoxButtonValues:
+                                                                  (values) {
+                                                                for (int i = 0;
+                                                                    i < values.length;
+                                                                    i++) {
+                                                                  projectIds.add(
+                                                                      values[i]
+                                                                          .toString());
+                                                                }
+                                                              },
+                                                              horizontal: true,
+                                                              selectedColor:
+                                                                  Colors.blue,
+                                                              padding: 5,
+                                                              unSelectedColor:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     )
                                                   ],
@@ -248,7 +255,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                     child: ListView.builder(
                                       itemCount: snapshot.data!.length,
                                       itemBuilder:
-                                          (BuildContext context, int index) {
+                                        (BuildContext context, int index) {
                                         return Column(
                                           children: [
                                             Padding(
