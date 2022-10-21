@@ -1,16 +1,9 @@
 import 'dart:io' as io;
-import 'package:audioplayers/audioplayers.dart' as ap;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:qronica_recorder/local_storage.dart';
 import 'package:qronica_recorder/pocketbase.dart';
-import 'package:universal_html/html.dart';
+import "package:http/http.dart";
 
 class StorageService {
   Position? position;
@@ -42,7 +35,7 @@ class StorageService {
   ) async {
     await getCurrentPosition();
     Uri myUri = Uri.parse(path);
-    final http.Response responseData = await http.get(myUri);
+    final Response responseData = await get(myUri);
     final uint8list = responseData.bodyBytes;
     String locationJSON = '''{
       "type": "FeatureCollection",
@@ -77,7 +70,7 @@ class StorageService {
         //'projects': projectIds[0],
       },
       files: [
-        http.MultipartFile.fromBytes(
+        MultipartFile.fromBytes(
           'file', // the name of the file field
           uint8list,
           filename: 'audio.blob',

@@ -1,9 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qronica_recorder/cubit/login_cubit.dart';
-import 'package:qronica_recorder/pocketbase.dart';
-import 'package:qronica_recorder/recorder_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);

@@ -1,14 +1,8 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qronica_recorder/cubit/login_cubit.dart';
 import 'package:qronica_recorder/local_storage.dart';
 import 'package:qronica_recorder/login_screen.dart';
-import 'package:qronica_recorder/pocketbase.dart';
 import 'package:qronica_recorder/recorder_screen.dart';
 import 'package:toast/toast.dart';
 
