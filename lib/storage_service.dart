@@ -53,8 +53,8 @@ class StorageService {
           "geometry": {
             "type": "Point",
             "coordinates": [
-              ${position!.latitude},
-              ${position!.longitude}
+              ${position?.latitude},
+              ${position?.longitude}
             ]
           }
         }
