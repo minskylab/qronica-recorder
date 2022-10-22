@@ -7,10 +7,10 @@ import 'package:just_audio/just_audio.dart';
 
 class AudioPlayer extends StatefulWidget {
   /// Path from where to play recorded audio
-  late String? source;
-  late int? duration;
-  late bool? newAudio;
-  late String? option;
+  late String source;
+  late int duration;
+  late bool newAudio;
+  late String option;
 
   /// Callback when audio file should be removed
   /// Setting this to null hides the delete button
@@ -54,7 +54,7 @@ class AudioPlayerState extends State<AudioPlayer> {
 
   void _init() async {
     print('llamando}');
-    await _audioPlayer.setUrl(widget.source ?? '');
+    await _audioPlayer.setUrl(widget.source);
     _audioPlayer.playerStateStream.listen((playerState) {
       final isPlaying = playerState.playing;
       final processingState = playerState.processingState;
@@ -94,7 +94,7 @@ class AudioPlayerState extends State<AudioPlayer> {
       progressNotifier.value = ProgressBarState(
         current: oldState.current,
         buffered: oldState.buffered,
-        total: Duration(milliseconds: widget.duration ?? 0),
+        total: Duration(milliseconds: widget.duration),
       );
     });
   }
@@ -103,7 +103,7 @@ class AudioPlayerState extends State<AudioPlayer> {
     print("widgets audio:${widget.newAudio}");
     print("widgets source:${widget.source}");
     if (widget.newAudio == true) {
-      await _audioPlayer.setUrl(widget.source ?? '');
+      await _audioPlayer.setUrl(widget.source);
       widget.newAudio = false;
     }
     _audioPlayer.play();
@@ -146,13 +146,11 @@ class AudioPlayerState extends State<AudioPlayer> {
                     child: const CircularProgressIndicator(),
                   );
                 case ButtonState.paused:
-                  return widget.source != null 
-                  ? IconButton(
+                  return IconButton(
                     icon: const Icon(Icons.play_arrow),
                     iconSize: 32.0,
                     onPressed: play,
-                  )
-                  :Container();
+                  );
                 case ButtonState.playing:
                   return IconButton(
                     icon: const Icon(Icons.pause),
@@ -162,11 +160,11 @@ class AudioPlayerState extends State<AudioPlayer> {
               }
             },
           ),
-          const SizedBox(height: 10),
-          widget.option == 'new' 
-          ?Container()
-          :IconButton(
-            icon: const Icon(Icons.delete,
+          IconButton(
+            icon: Icon(
+                widget.option == "back"
+                    ? Icons.arrow_back_ios_new_sharp
+                    : Icons.delete,
                 color: Color(0xFF73748D),
                 size: 24),
             onPressed: () {
