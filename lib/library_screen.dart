@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qronica_recorder/cubit/login_cubit.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class LibraryScreen extends StatefulWidget {
+  const LibraryScreen({Key? key}) : super(key: key);
 
-  static Route route() =>
-      MaterialPageRoute<void>(builder: (_) => const LoginScreen());
+  @override
+  State<LibraryScreen> createState() => _LibraryScreenState();
+}
 
+class _LibraryScreenState extends State<LibraryScreen> {
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginCubit, LoginState>(
       builder: (context, state) {
@@ -29,25 +32,19 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(
                       height: 44.0,
                     ),
-                    TextField(
-                      decoration: const InputDecoration(
-                          hintText: "Correo", prefixIcon: Icon(Icons.mail)),
-                      onChanged: (val) {
-                        context.read<LoginCubit>().changeEmailAddress(val);
-                      },
-                    ),
-                    const SizedBox(
-                      height: 26.0,
-                    ),
-                    TextField(
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                          hintText: "Contraseña",
-                          prefixIcon: Icon(Icons.password)),
-                      onChanged: (val) {
-                        context.read<LoginCubit>().changePassword(val);
-                      },
-                    ),
+                    Container(
+                        width: double.infinity,
+                        child: RawMaterialButton(
+                          fillColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          onPressed: () {
+                            context.read<LoginCubit>().login();
+                          },
+                          child: const Text("Grabar nuevo audio"),
+                        )),
                     const SizedBox(
                       height: 26.0,
                     ),
@@ -62,7 +59,7 @@ class LoginScreen extends StatelessWidget {
                           onPressed: () {
                             context.read<LoginCubit>().login();
                           },
-                          child: const Text("Ingresar"),
+                          child: const Text("Audios Grabados"),
                         ))
                   ],
                 )));
