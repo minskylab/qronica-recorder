@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qronica_recorder/cubit/login_cubit.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
-  static Route route() =>
-      MaterialPageRoute<void>(builder: (_) => const LoginScreen());
 
-  Widget build(BuildContext context) {
-    return BlocBuilder<LoginCubit, LoginState>(
-      builder: (context, state) {
-        return Container(
+   Widget build(BuildContext context) {
+    return Container(
             width: 700,
             child: Padding(
                 padding: EdgeInsets.all(16.0),
@@ -29,25 +25,22 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(
                       height: 44.0,
                     ),
-                    TextField(
-                      decoration: const InputDecoration(
-                          hintText: "Correo", prefixIcon: Icon(Icons.mail)),
-                      onChanged: (val) {
-                        context.read<LoginCubit>().changeEmailAddress(val);
-                      },
-                    ),
-                    const SizedBox(
-                      height: 26.0,
-                    ),
-                    TextField(
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                          hintText: "Contraseña",
-                          prefixIcon: Icon(Icons.password)),
-                      onChanged: (val) {
-                        context.read<LoginCubit>().changePassword(val);
-                      },
-                    ),
+                    Container(
+                        width: double.infinity,
+                        child: RawMaterialButton(
+                          fillColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pushNamed("/recorderScreen");
+                          },
+                          child: const Text("Grabar nuevo audio",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),),
+                        )),
                     const SizedBox(
                       height: 26.0,
                     ),
@@ -60,13 +53,16 @@ class LoginScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           onPressed: () {
-                            context.read<LoginCubit>().login();
+                            Navigator.of(context).pushNamed("/playerScreen");
                           },
-                          child: const Text("Ingresar"),
+                          child: const Text("Audios Grabados",
+                            style: TextStyle(
+                            color: Colors.white,
+                          ),),
                         ))
                   ],
                 )));
-      },
-    );
   }
+
 }
+
