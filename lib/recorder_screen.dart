@@ -195,18 +195,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                         ],
                       ),
                     ])
-                  : AudioRecorder(
-                      onStop: (path, duration) {
-                        if (kDebugMode) print('Recorded file path: ');
-                        setState(() {
-                          audioPath = path;
-                          showPlayer = true;
-                          durationTotal = duration;
-                          context.read<AudioplayerCubit>().update(
-                              audioPath, 'Audio Grabado', durationTotal, false);
-                        });
-                      },
-                    ),
+                  : AudioRecorder(),
             );
           },
         ),
