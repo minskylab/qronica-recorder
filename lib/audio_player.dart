@@ -53,7 +53,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
   double sliderCurrentPosition = 0.0;
   double maxDuration = 1.0;
   Media? _media = Media.file;
-  Codec _codec = Codec.opusWebM;
+  Codec _codec = Codec.aacMP4;
 
   bool? _encoderSupported = true; // Optimist
   bool _decoderSupported = true; // Optimist
@@ -68,8 +68,16 @@ class _AudioPlayerState extends State<AudioPlayer> {
     await setCodec(_codec);
   }
 
+  Future<void> openThePlayer() async {
+    await recorderModule.openRecorder();
+
+    if (!await recorderModule.isEncoderSupported(_codec) && kIsWeb) {
+      _codec = Codec.opusWebM;
+    }
+  }
 
   Future<void> init() async {
+    await openThePlayer();
     await _initializeExample();
 
     final session = await AudioSession.instance;
