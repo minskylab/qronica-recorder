@@ -10,7 +10,7 @@ import 'package:qronica_recorder/cubit/audioplayer_cubit.dart';
 import 'package:qronica_recorder/pocketbase.dart';
 import 'package:qronica_recorder/storage_service.dart';
 import 'package:qronica_recorder/audio_player.dart';
-import 'package:qronica_recorder/audiorecorder.dart';
+import 'package:qronica_recorder/audio_recorder.dart';
 
 class PlayerScreen extends StatefulWidget {
   PlayerScreen({Key? key}) : super(key: key);
@@ -21,6 +21,27 @@ class PlayerScreen extends StatefulWidget {
 
 class _PlayerScreenState extends State<PlayerScreen> {
   bool showPlayer = false;
+    final List<String?> _path = [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  ];
   String audioPath = "";
   int durationTotal = 0;
   List<String> projectIds = [];
@@ -69,19 +90,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                       ),
 
                                     AudioPlayer(
-                                      source: state.source,
-                                      duration: state.duration,
-                                      newAudio: state.newAudio,
-                                      option: 'new',
-                                      onDelete: () {
-                                        setState(() {
-                                          context
-                                              .read<AudioplayerCubit>()
-                                              .notUploaded();
-                                          showPlayer = false;
-                                        });
-                                      },
-                                    ),
+                                      path: _path,
+                                      sourceType: 'onlineAudio',
+                                      onlinePath: state.source,),
                                   ],
                                 )),
                         const SizedBox(

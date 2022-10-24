@@ -27,6 +27,16 @@ enum AudioState { isPlaying, isPaused, isStopped, isRecording,isRecordingPaused,
 
 ///
 class AudioRecorder extends StatefulWidget {
+
+  const AudioRecorder({
+    Key? key,
+    required this.onStop,
+  }) : super(key: key);
+
+
+  final void Function(List<String?> path, String? audioPath) onStop; 
+
+
   @override
   _AudioRecorderState createState() => _AudioRecorderState();
 }
@@ -269,10 +279,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
     setState(() {
       _isRecording = false;
     });
-  }
-
-  Future<bool> fileExists(String path) async {
-    return await File(path).exists();
+    widget.onStop(_path, _path[_codec.index]);
   }
 
 
@@ -297,134 +304,6 @@ class _AudioRecorderState extends State<AudioRecorder> {
     });
   }
 
-  Future<Uint8List> _readFileByte(String filePath) async {
-    var myUri = Uri.parse(filePath);
-    var audioFile = File.fromUri(myUri);
-    Uint8List bytes;
-    var b = await audioFile.readAsBytes();
-    bytes = Uint8List.fromList(b);
-    playerModule.logger.d('reading of bytes is completed');
-    return bytes;
-  }
-
-  Future<Uint8List> getAssetData(String path) async {
-    var asset = await rootBundle.load(path);
-    return asset.buffer.asUint8List();
-  }
-
-  /*
-  Future<void> feedHim(String path) async {
-    var data = await _readFileByte(path);
-    return await playerModule.feedFromStream(data);
-  }
-*/
-
-  final int blockSize = 4096;
-  Future<void> feedHim(String path) async {
-    var buffer = await _readFileByte(path);
-    //var buffer = await getAssetData('assets/samples/sample.pcm');
-
-    var lnData = 0;
-    var totalLength = buffer.length;
-    while (totalLength > 0 && !playerModule.isStopped) {
-      var bsize = totalLength > blockSize ? blockSize : totalLength;
-      await playerModule
-          .feedFromStream(buffer.sublist(lnData, lnData + bsize)); // await !!!!
-      lnData += bsize;
-      totalLength -= bsize;
-    }
-  }
-
-  Future<void> startPlayer() async {
-    try {
-      Uint8List? dataBuffer;
-      String? audioFilePath;
-      var codec = _codec;
-       if (_media == Media.file || _media == Media.stream) {
-        // Do we want to play from buffer or from file ?
-        if (kIsWeb || await fileExists(_path[codec.index]!)) {
-          audioFilePath = _path[codec.index];
-        }
-      }
-
-      if (_media == Media.stream) {
-        await playerModule.startPlayerFromStream(
-          codec: Codec.pcm16, //_codec,
-          numChannels: 1,
-          sampleRate: tSTREAMSAMPLERATE, //tSAMPLERATE,
-        );
-        _addListeners();
-        setState(() {});
-        await feedHim(audioFilePath!);
-        //await finishPlayer();
-        await stopPlayer();
-        return;
-      } else {
-        if (audioFilePath != null) {
-          await playerModule.startPlayer(
-              fromURI: audioFilePath,
-              codec: codec,
-              sampleRate: tSTREAMSAMPLERATE,
-              whenFinished: () {
-                playerModule.logger.d('Play finished');
-                setState(() {});
-              });
-        } else if (dataBuffer != null) {
-          if (codec == Codec.pcm16) {
-            dataBuffer = await flutterSoundHelper.pcmToWaveBuffer(
-              inputBuffer: dataBuffer,
-              numChannels: 1,
-              sampleRate: (_codec == Codec.pcm16 && _media == Media.asset)
-                  ? 48000
-                  : tSAMPLERATE,
-            );
-            codec = Codec.pcm16WAV;
-          }
-          await playerModule.startPlayer(
-              fromDataBuffer: dataBuffer,
-              sampleRate: tSAMPLERATE,
-              codec: codec,
-              whenFinished: () {
-                playerModule.logger.d('Play finished');
-                setState(() {});
-              });
-        }
-      }
-      _addListeners();
-      setState(() {});
-      playerModule.logger.d('<--- startPlayer');
-    } on Exception catch (err) {
-      playerModule.logger.e('error: $err');
-    }
-  }
-
-  Future<void> stopPlayer() async {
-    try {
-      await playerModule.stopPlayer();
-      playerModule.logger.d('stopPlayer');
-      if (_playerSubscription != null) {
-        await _playerSubscription!.cancel();
-        _playerSubscription = null;
-      }
-      sliderCurrentPosition = 0.0;
-    } on Exception catch (err) {
-      playerModule.logger.d('error: $err');
-    }
-    setState(() {});
-  }
-
-  void pauseResumePlayer() async {
-    try {
-      if (playerModule.isPlaying) {
-        await playerModule.pausePlayer();
-      } else {
-        await playerModule.resumePlayer();
-      }
-    } on Exception catch (err) {
-      playerModule.logger.e('error: $err');
-    }
-    setState(() {});
-  }
 
   void pauseResumeRecorder() async {
     try {
@@ -440,25 +319,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
     setState(() {});
   }
 
-  Future<void> seekToPlayer(int milliSecs) async {
-    //playerModule.logger.d('-->seekToPlayer');
-    try {
-      if (playerModule.isPlaying) {
-        await playerModule.seekToPlayer(Duration(milliseconds: milliSecs));
-      }
-    } on Exception catch (err) {
-      playerModule.logger.e('error: $err');
-    }
-    setState(() {});
-    //playerModule.logger.d('<--seekToPlayer');
-  }
 
-  void Function()? onPauseResumePlayerPressed() {
-    if (playerModule.isPaused || playerModule.isPlaying) {
-      return pauseResumePlayer;
-    }
-    return null;
-  }
 
   void Function()? onPauseResumeRecorderPressed() {
     if (recorderModule.isPaused || recorderModule.isRecording) {
@@ -467,34 +328,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
     return null;
   }
 
-  void Function()? onStopPlayerPressed() {
-    return (playerModule.isPlaying || playerModule.isPaused)
-        ? stopPlayer
-        : null;
-  }
 
-  void Function()? onStartPlayerPressed() {
-    if (_media == Media.buffer && kIsWeb) {
-      return null;
-    }
-    if (_media == Media.file ||
-        _media == Media.stream ||
-        _media == Media.buffer) // A file must be already recorded to play it
-    {
-      if (_path[_codec.index] == null) return null;
-    }
-
-    if (_media == Media.stream && _codec != Codec.pcm16) {
-      return null;
-    }
-
-    // Disable the button if the selected codec is not supported
-    if (!(_decoderSupported || _codec == Codec.pcm16)) {
-      return null;
-    }
-
-    return (playerModule.isStopped) ? startPlayer : null;
-  }
 
   void startStopRecorder() {
     if (recorderModule.isRecording || recorderModule.isPaused) {
@@ -569,7 +403,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
       child: Material(
         color: color,
         child: TextButton(
-          onPressed: onPauseResumePlayerPressed(),
+          onPressed: onPauseResumeRecorderPressed(),
           //padding: EdgeInsets.all(8.0),
           child: InkWell(
           child: SizedBox(width: 60, height: 60, child: icon),
@@ -613,71 +447,10 @@ class _AudioRecorderState extends State<AudioRecorder> {
           ),
         ]);
 
-    Widget playerSection = Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(top: 12.0, bottom: 16.0),
-          child: Text(
-            _playerTxt,
-            style: TextStyle(
-              fontSize: 35.0,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              width: 56.0,
-              height: 50.0,
-              child: IconButton(
-                    icon: const Icon(Icons.play_arrow),
-                    iconSize: 32.0,
-                    onPressed: onStartPlayerPressed(),
-                  ),
-            ),
-            Container(
-              width: 56.0,
-              height: 50.0,
-              child:IconButton(
-                    icon: const Icon(Icons.pause),
-                    iconSize: 32.0,
-                    onPressed: onPauseResumePlayerPressed(),
-                  ),
-            ),
-            Container(
-              width: 56.0,
-              height: 50.0,
-                  child:  IconButton(
-                    icon: const Icon(Icons.stop),
-                    iconSize: 32.0,
-                    onPressed: onStopPlayerPressed(),
 
-                  )
-            ),
-          ],
-        ),
-        Container(
-            height: 30.0,
-            child: Slider(
-                value: min(sliderCurrentPosition, maxDuration),
-                min: 0.0,
-                max: maxDuration,
-                onChanged: (value) async {
-                  await seekToPlayer(value.toInt());
-                },
-                divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt())),
-      ],
-    );
-
-    return ListView(
+    return Column(
         children: <Widget>[
           recorderSection,
-          playerSection,
         ],
       );
   }

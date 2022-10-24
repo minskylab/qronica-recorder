@@ -8,9 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:qronica_recorder/cubit/audioplayer_cubit.dart';
 import 'package:qronica_recorder/pocketbase.dart';
+import 'package:qronica_recorder/session_storage.dart';
 import 'package:qronica_recorder/storage_service.dart';
 import 'package:qronica_recorder/audio_player.dart';
-import 'package:qronica_recorder/audiorecorder.dart';
+import 'package:qronica_recorder/audio_recorder.dart';
 
 class RecorderScreen extends StatefulWidget {
   RecorderScreen({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class RecorderScreen extends StatefulWidget {
 
 class _RecorderScreenState extends State<RecorderScreen> {
   bool showPlayer = false;
-  String audioPath = "";
+  List<String?> listPath = [];
   int durationTotal = 0;
   List<String> projectIds = [];
   final StorageService storage = StorageService();
@@ -32,12 +33,12 @@ class _RecorderScreenState extends State<RecorderScreen> {
     super.initState();
   }
 
-  Future<void> asyncUpload(BuildContext context, VoidCallback onSuccess) async {
+  Future<void> asyncUpload(String? audioPath,BuildContext context, VoidCallback onSuccess) async {
     setState(() {
       context.read<AudioplayerCubit>().uploading();
     });
-    final path = audioPath;
-    var uri = Uri.dataFromString(audioPath);
+    final path = SessionStorageHelper.getValue(audioPath ?? '');
+    var uri = Uri.dataFromString(path);
     final fileName = uri.pathSegments[3];
     await storage.uploadAudio(path, fileName, durationTotal, projectIds);
 
@@ -67,20 +68,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                     "Reproduciendo audio",
                                     style: TextStyle(height: 5, fontSize: 20),
                                   ),
-                                  AudioPlayer(
-                                    source: state.source!,
-                                    duration: state.duration!,
-                                    newAudio: state.newAudio!,
-                                    option: 'back',
-                                    onDelete: () {
-                                      setState(() {
-                                        context
-                                            .read<AudioplayerCubit>()
-                                            .notUploaded();
-                                        showPlayer = false;
-                                      });
-                                    },
-                                  ),
+                                  AudioPlayer(path: listPath, sourceType: '',),
                                 ],
                               )),
                           Padding(
@@ -170,7 +158,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                         const SizedBox(height: 20.0),
                                         ElevatedButton(
                                             onPressed: () =>
-                                                asyncUpload(context, () {
+                                                asyncUpload(state.source,context, () {
                                                   context
                                                       .read<AudioplayerCubit>()
                                                       .uploaded();
@@ -195,7 +183,16 @@ class _RecorderScreenState extends State<RecorderScreen> {
                         ],
                       ),
                     ])
-                  : AudioRecorder(),
+                  : AudioRecorder(
+                      onStop: (path, audioPath) {
+                        setState(() {
+                          listPath = path;
+                          showPlayer = true;
+                          context.read<AudioplayerCubit>().update(
+                              audioPath, 'Audio Grabado', durationTotal, false);
+                        });
+                      },
+                    ),
             );
           },
         ),
