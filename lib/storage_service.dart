@@ -4,6 +4,8 @@ import 'package:pocketbase/pocketbase.dart';
 import 'package:qronica_recorder/local_storage.dart';
 import 'package:qronica_recorder/pocketbase.dart';
 import "package:http/http.dart";
+import 'package:http_parser/http_parser.dart';
+import 'package:qronica_recorder/session_storage.dart';
 
 class StorageService {
   Position? position;
@@ -73,7 +75,8 @@ class StorageService {
         MultipartFile.fromBytes(
           'file', // the name of the file field
           uint8list,
-          filename: 'audio.blob',
+          filename: 'audio.webm',
+          contentType: MediaType.parse('audio/webm'),
         )
       ],
     );
