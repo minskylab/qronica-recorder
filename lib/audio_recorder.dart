@@ -331,6 +331,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
 
   void startStopRecorder() {
+    print("hola");
     if (recorderModule.isRecording || recorderModule.isPaused) {
       stopRecorder();
     } else {
@@ -338,11 +339,54 @@ class _AudioRecorderState extends State<AudioRecorder> {
     }
   }
 
-  void Function()? onStartRecorderPressed() {
+  void showRecording(BuildContext context){
+    bool pressed = onStartRecorderPressed();
+    if (pressed) {
+      startStopRecorder();
+    }
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          height:300,
+          child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(top: 12.0, bottom: 16.0),
+            child: Text(
+              _recorderTxt,
+              style: TextStyle(
+                fontSize: 35.0,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          _isRecording
+              ? LinearProgressIndicator(
+                  value: 100.0 / 160.0 * (_dbLevel ?? 1) / 100,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  backgroundColor: Colors.red)
+              : Container(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              _buildPauseResumeControl(),
+            ],
+          ),
+        ])
+        );
+      },
+    );
+  }
+
+  bool onStartRecorderPressed() {
     // Disable the button if the selected codec is not supported
-    if (!_encoderSupported!) return null;
-    if (_media == Media.stream && _codec != Codec.pcm16) return null;
-    return startStopRecorder;
+    if (!_encoderSupported!) return false;
+    if (_media == Media.stream && _codec != Codec.pcm16) return false;
+    return true;
   }
 
   Future<void> setCodec(Codec codec) async {
@@ -365,14 +409,32 @@ class _AudioRecorderState extends State<AudioRecorder> {
     } else {
       final theme = Theme.of(context);
       icon = Icon(Icons.mic, color: theme.primaryColor, size: 30);
-      color = theme.primaryColor.withOpacity(0.1);
+      color = Colors.black;
+      return ClipOval(
+      child: Material(
+        color: color,
+        child:  TextButton(
+          onPressed: ()=>[showRecording(context)],
+          //padding: EdgeInsets.all(8.0),
+          child: Ink(
+            decoration: BoxDecoration(
+            border: Border.all(color: const Color(0xFFF5F5F5), width: 5),
+            color: Color(0XFFFF463A),
+            borderRadius: BorderRadius.circular(40.0)),
+            child: InkWell(
+            child: SizedBox(width: 50, height: 50),
+                  ),
+          ),
+        ),
+      ),
+    );
     }
 
     return ClipOval(
       child: Material(
         color: color,
         child:  TextButton(
-          onPressed: onStartRecorderPressed(),
+          onPressed: ()=>[showRecording(context)],
           //padding: EdgeInsets.all(8.0),
           child: InkWell(
           child: SizedBox(width: 60, height: 60, child: icon),
@@ -421,22 +483,6 @@ class _AudioRecorderState extends State<AudioRecorder> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(top: 12.0, bottom: 16.0),
-            child: Text(
-              _recorderTxt,
-              style: TextStyle(
-                fontSize: 35.0,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          _isRecording
-              ? LinearProgressIndicator(
-                  value: 100.0 / 160.0 * (_dbLevel ?? 1) / 100,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                  backgroundColor: Colors.red)
-              : Container(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,

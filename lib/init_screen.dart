@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qronica_recorder/cubit/login_cubit.dart';
 import 'package:qronica_recorder/local_storage.dart';
@@ -20,25 +21,29 @@ class _InitScreenState extends State<InitScreen> {
     ToastContext().init(context);
     return BlocProvider(
       create: (context) => LoginCubit(),
-      child: Scaffold(
-              appBar: AppBar(actions: [
-                BlocBuilder<LoginCubit, LoginState>(
-                  builder: (context, state) {
-                    if (state.status == StatusLogin.success ||
-                        LocalStorageHelper.getValue('loggedIn') == 'true') {
-                      return SizedBox(
-                          width: 60,
-                          child: InkWell(
-                              onTap: <Widget>() {
-                                LocalStorageHelper.clearAll();
-                                context.read<LoginCubit>().logout();
-                              },
-                              child: const Icon(Icons.logout)));
-                    }
-                    return Container();
-                  },
-                ),
-              ]),
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.light,
+        ),
+        child: Scaffold(
+              //appBar: AppBar(actions: [
+              //  BlocBuilder<LoginCubit, LoginState>(
+              //    builder: (context, state) {
+              //      if (state.status == StatusLogin.success ||
+              //          LocalStorageHelper.getValue('loggedIn') == 'true') {
+              //        return SizedBox(
+              //            width: 60,
+              //            child: InkWell(
+              //                onTap: <Widget>() {
+              //                  LocalStorageHelper.clearAll();
+              //                  context.read<LoginCubit>().logout();
+              //                },
+              //                child: const Icon(Icons.logout)));
+              //      }
+              //      return Container();
+              //    },
+              //  ),
+              //]),
               body: Center(
                 child: BlocBuilder<LoginCubit, LoginState>(
                   builder: (context, state) {
@@ -61,7 +66,8 @@ class _InitScreenState extends State<InitScreen> {
                   },
                 ),
               ),
-            )
+            ),
+      )
     );
   }
 }

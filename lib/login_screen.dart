@@ -14,36 +14,65 @@ class LoginScreen extends StatelessWidget {
         return Container(
             width: 700,
             child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(32.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Qronica",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    const Image(
+                      image: AssetImage("assets/images/qronicaLogo.png")
                     ),
                     const SizedBox(
-                      height: 44.0,
+                      height: 50.0,
+                    ),
+                    Text(
+                      "Correo",
+                      style: Theme.of(context).textTheme.bodyText1?.merge(
+                        const TextStyle(
+                          fontWeight: FontWeight.w500, 
+                          fontSize: 14,
+                        ),
+                        ),
+                    ),
+                    const SizedBox(
+                      height: 8,
                     ),
                     TextField(
                       decoration: const InputDecoration(
-                          hintText: "Correo", prefixIcon: Icon(Icons.mail)),
+                        border: InputBorder.none,
+                        fillColor: Color(0xFFFFFFFF),
+                        filled: true,
+                        hintText: "correo@dominio.com", 
+                        prefixIcon: Icon(Icons.mail)
+                      ),
                       onChanged: (val) {
                         context.read<LoginCubit>().changeEmailAddress(val);
                       },
                     ),
                     const SizedBox(
-                      height: 26.0,
+                      height: 32,
+                    ),
+                    Text(
+                      "Contraseña",
+                      style: Theme.of(context).textTheme.bodyText1?.merge(
+                        const TextStyle(
+                          fontWeight: FontWeight.w500, 
+                          fontSize: 14,
+                        ),
+                        ),
+                    ),
+                    const SizedBox(
+                      height: 8,
                     ),
                     TextField(
                       obscureText: true,
                       decoration: const InputDecoration(
-                          hintText: "Contraseña",
-                          prefixIcon: Icon(Icons.password)),
+                        border: InputBorder.none,
+                        fillColor: Color(0xFFFFFFFF),
+                        filled: true,
+                        hintText: "Contraseña", 
+                        prefixIcon: Icon(Icons.password)
+                      ),
                       onChanged: (val) {
                         context.read<LoginCubit>().changePassword(val);
                       },
@@ -54,15 +83,18 @@ class LoginScreen extends StatelessWidget {
                     Container(
                         width: double.infinity,
                         child: RawMaterialButton(
-                          fillColor: Colors.blue,
+                          fillColor: Theme.of(context).primaryColor,
                           padding: const EdgeInsets.symmetric(vertical: 20.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
                           onPressed: () {
                             context.read<LoginCubit>().login();
                           },
-                          child: const Text("Ingresar"),
+                          child: const Text(
+                          "Ingresar",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, 
+                              fontSize: 14,
+                            ),
+                        ),
                         ))
                   ],
                 )));
