@@ -152,10 +152,22 @@ class HomeScreen extends StatelessWidget {
                             }),
                       ),
                           Container(
-                            child: AudioRecorder(
-                              onStop: (path, audioPath) {
+                            child: ElevatedButton(
+                              child: Text('Show Modal Bottom Sheet'),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Container(
+                                      child: AudioRecorder(
+                                        onStop: (path, audioPath) {
+                                        },
+                                      ),
+                                    );
+                                  },
+                                );
                               },
-                            )
+                            ),
                           )
                   //  Container(
                   //      width: double.infinity,

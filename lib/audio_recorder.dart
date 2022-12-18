@@ -33,7 +33,6 @@ class AudioRecorder extends StatefulWidget {
     required this.onStop,
   }) : super(key: key);
 
-
   final void Function(List<String?> path, String? audioPath) onStop; 
 
 
@@ -133,6 +132,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
+          startStopRecorder();
+
   }
 
 
@@ -331,7 +332,6 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
 
   void startStopRecorder() {
-    print("hola");
     if (recorderModule.isRecording || recorderModule.isPaused) {
       stopRecorder();
     } else {
@@ -339,54 +339,11 @@ class _AudioRecorderState extends State<AudioRecorder> {
     }
   }
 
-  void showRecording(BuildContext context){
-    bool pressed = onStartRecorderPressed();
-    if (pressed) {
-      startStopRecorder();
-    }
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          height:300,
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(top: 12.0, bottom: 16.0),
-            child: Text(
-              _recorderTxt,
-              style: TextStyle(
-                fontSize: 35.0,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          _isRecording
-              ? LinearProgressIndicator(
-                  value: 100.0 / 160.0 * (_dbLevel ?? 1) / 100,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                  backgroundColor: Colors.red)
-              : Container(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              _buildPauseResumeControl(),
-            ],
-          ),
-        ])
-        );
-      },
-    );
-  }
-
-  bool onStartRecorderPressed() {
+  void Function()? onStartRecorderPressed() {
     // Disable the button if the selected codec is not supported
-    if (!_encoderSupported!) return false;
-    if (_media == Media.stream && _codec != Codec.pcm16) return false;
-    return true;
+    if (!_encoderSupported!) return null;
+    if (_media == Media.stream && _codec != Codec.pcm16) return null;
+    return startStopRecorder;
   }
 
   Future<void> setCodec(Codec codec) async {
@@ -414,7 +371,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
       child: Material(
         color: color,
         child:  TextButton(
-          onPressed: ()=>[showRecording(context)],
+          onPressed: onStartRecorderPressed(),
           //padding: EdgeInsets.all(8.0),
           child: Ink(
             decoration: BoxDecoration(
@@ -434,7 +391,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
       child: Material(
         color: color,
         child:  TextButton(
-          onPressed: ()=>[showRecording(context)],
+          onPressed: onStartRecorderPressed(),
           //padding: EdgeInsets.all(8.0),
           child: InkWell(
           child: SizedBox(width: 60, height: 60, child: icon),
@@ -483,6 +440,22 @@ class _AudioRecorderState extends State<AudioRecorder> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(top: 12.0, bottom: 16.0),
+            child: Text(
+              _recorderTxt,
+              style: TextStyle(
+                fontSize: 35.0,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          _isRecording
+              ? LinearProgressIndicator(
+                  value: 100.0 / 160.0 * (_dbLevel ?? 1) / 100,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  backgroundColor: Colors.red)
+              : Container(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -492,7 +465,6 @@ class _AudioRecorderState extends State<AudioRecorder> {
             ],
           ),
         ]);
-
 
     return Column(
         children: <Widget>[
