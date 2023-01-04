@@ -23,7 +23,7 @@ class RecorderScreen extends StatefulWidget {
 class _RecorderScreenState extends State<RecorderScreen> {
   bool showPlayer = false;
   List<String?> listPath = [];
-  int durationTotal = 0;
+  String durationTotal = "";
   List<String> projectIds = [];
   final StorageService storage = StorageService();
 
@@ -33,14 +33,14 @@ class _RecorderScreenState extends State<RecorderScreen> {
     super.initState();
   }
 
-  Future<void> asyncUpload(String? audioPath,BuildContext context, VoidCallback onSuccess) async {
+  Future<void> asyncUpload(String? audioPath, String? name, BuildContext context, VoidCallback onSuccess) async {
     setState(() {
       context.read<AudioplayerCubit>().uploading();
     });
     final path = SessionStorageHelper.getValue(audioPath ?? '');
     var uri = Uri.dataFromString(path);
-    final fileName = uri.pathSegments[3];
-    await storage.uploadAudio(path, fileName, durationTotal, projectIds);
+    final fileName = name ?? '';
+    await storage.uploadAudio(path, durationTotal, fileName, projectIds);
 
     onSuccess.call();
   }
@@ -158,7 +158,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                                         const SizedBox(height: 20.0),
                                         ElevatedButton(
                                             onPressed: () =>
-                                                asyncUpload(state.source,context, () {
+                                                asyncUpload(state.source, state.sourceName ,context, () {
                                                   context
                                                       .read<AudioplayerCubit>()
                                                       .uploaded();
@@ -184,7 +184,7 @@ class _RecorderScreenState extends State<RecorderScreen> {
                       ),
                     ])
                   : AudioRecorder(
-                      onStop: (path, audioPath) {
+                      onStop: (path, audioPath, duration) {
                         setState(() {
                           listPath = path;
                           showPlayer = true;

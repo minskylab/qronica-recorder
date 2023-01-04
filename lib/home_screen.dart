@@ -1,17 +1,62 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:qronica_recorder/audio_recorder.dart';
+import 'package:qronica_recorder/cubit/audioplayer_cubit.dart';
 import 'package:qronica_recorder/cubit/login_cubit.dart';
 import 'package:qronica_recorder/pocketbase.dart';
+import 'package:qronica_recorder/session_storage.dart';
 import 'package:qronica_recorder/storage_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+
   const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
 
-   Widget build(BuildContext context) {
-    return Container(
+class _HomeScreenState extends State<HomeScreen> {
+  bool showPlayer = false;
+    List<String> projectIds = [];
+      String? durationTotal = "";
+
+  final StorageService storage = StorageService();
+
+  @override
+  void initState() {
+    showPlayer = false;
+    super.initState();
+  }
+
+  Future<void> asyncUpload(String? audioPath, String? duracion, String? name, BuildContext context, VoidCallback onSuccess) async {
+    setState(() {
+      context.read<AudioplayerCubit>().uploading();
+    });
+    String path = "";
+    if (!kIsWeb)
+    {
+      path = audioPath ?? '';
+    }
+    else{
+     path = SessionStorageHelper.getValue(audioPath ?? '');
+    }
+    final fileName = name ?? '';
+    await storage.uploadAudio(path, duracion ?? '00:00:00',fileName, projectIds);
+    print("duracion:$duracion");
+    print(audioPath);
+
+    onSuccess.call();
+  }
+
+    Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => AudioplayerCubit(),
+      child: BlocBuilder<AudioplayerCubit, AudioplayerState>(
+        builder: (context, state) {
+          return Container(
             width: 700,
             child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -81,11 +126,11 @@ class HomeScreen extends StatelessWidget {
                       ]
                     ),
                     const SizedBox(
-                      height: 44.0,
+                      height: 20.0,
                     ),
                       Container(
-                        padding: EdgeInsets.only(right:16, left:16),
-                        height:340,
+                        width: double.infinity,
+                        height:400,
                         child: FutureBuilder(
                             future: StorageService().listFiles(),
                             builder: (BuildContext context,
@@ -93,38 +138,14 @@ class HomeScreen extends StatelessWidget {
                               if (snapshot.connectionState ==
                                       ConnectionState.done &&
                                   snapshot.hasData) {
-                                return Container(
-                                    height: 200,
-                                    width: 400,
-                                    child: ListView.builder(
-                                      itemCount: snapshot.data!.length,
-                                      itemBuilder:
-                                        (BuildContext context, int index) {
-                                        return Column(
-                                          children: [
-                                            Padding(
-                                                padding: const EdgeInsets.all(10),
-                                                child: ElevatedButton(
-                                                  onPressed: () async {
-                                                    final url =
-                                                        '${PocketBaseSample.url}/api/files/resources/${snapshot.data!.elementAt(index).id}/${snapshot.data!.elementAt(index).data['file']}';
-                                                  },
-                                                  style: ElevatedButton.styleFrom(
-                                                      primary: Colors.blue),
-                                                  child: Text(snapshot.data!
-                                                      .elementAt(index)
-                                                      .id),
-                                                ))
-                                          ],
-                                        );
-                                      },
-                                    ));
-                              }
-                              else if (snapshot.connectionState == ConnectionState.done &&
-                              !snapshot.hasData){
+                                    if(snapshot.data!.isEmpty)
+                                    {
                                   return Center(
                                     child: Column(
                                       children: const[
+                                        SizedBox(
+                                          height: 40.0,
+                                        ),
                                         Image(
                                           height:270,
                                           image: AssetImage("assets/images/headphones@4x.png"),
@@ -143,30 +164,250 @@ class HomeScreen extends StatelessWidget {
                                       ],
                                     ),
                                   );
+                                    }
+                                    else{
+                                    return ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      itemCount: snapshot.data!.length,
+                                      itemBuilder:
+                                        (BuildContext context, int index) {
+                                          DateTime now = DateTime.now();
+                                          String formattedDateNow = DateFormat('yyyy-MM-dd').format(now);
+                                          DateTime recordDate =  DateTime.parse(snapshot.data!.elementAt(index).created);
+                                          String formattedRecordDate = DateFormat('yyyy-MM-dd').format(recordDate);
+                                          String time = DateFormat.Hm().format(recordDate);
+                                        return Container(
+                                          padding: EdgeInsets.only(bottom: 20),
+                                                  width: double.infinity,
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                      snapshot
+                                                          .data!
+                                                          .elementAt(index)
+                                                          .data['name'],
+                                                      style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                        const TextStyle(
+                                                          fontWeight: FontWeight.w700, 
+                                                          fontSize: 16,
+                                                        ),
+                                                        ),
+                                                    ),
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                      formattedDateNow == formattedRecordDate ?
+                                                      "Hoy - $time" :
+                                                      "$formattedRecordDate - $time",
+                                                      style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                        const TextStyle(
+                                                          fontWeight: FontWeight.w500, 
+                                                          fontSize: 14,
+                                                        ),
+                                                        ),
+                                                    ),
+                                                    Spacer(),
+                                                    Text(
+                                                      snapshot
+                                                          .data!
+                                                          .elementAt(index)
+                                                          .data['metadata']['duration'],
+                                                      style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                        const TextStyle(
+                                                          fontWeight: FontWeight.w500, 
+                                                          fontSize: 14,
+                                                        ),
+                                                        ),
+                                                    )
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                      Text(
+                                                      "",
+                                                      style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                        const TextStyle(
+                                                          fontWeight: FontWeight.w500, 
+                                                          fontSize: 14,
+                                                        ),
+                                                        ),
+                                                    ),
+                                                    Spacer(),
+                                                    Text(
+                                                      "Titulo de proy.",
+                                                      style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                        const TextStyle(
+                                                          fontWeight: FontWeight.w500, 
+                                                          fontSize: 14,
+                                                        ),
+                                                        ),
+                                                    )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  )
+                                                );
+                                      },
+                                    );
+                                    }
                               }
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
+                                    print("cargandi");
                                 return Center(child: const CircularProgressIndicator());
                               }
                               return Container();
                             }),
                       ),
-                          Container(
-                            child: ElevatedButton(
-                              child: Text('Show Modal Bottom Sheet'),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return Container(
-                                      child: AudioRecorder(
-                                        onStop: (path, audioPath) {
-                                        },
-                                      ),
+                      SizedBox(
+                        height:50
+                      ),
+                          Center(
+                            child:  ClipOval(
+                              child: Material(
+                                color: Colors.black,
+                                child:  TextButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return Container(
+                                          height:300,
+                                          padding: EdgeInsets.all(30),
+                                          child: BlocProvider(
+                                                  create: (context) => AudioplayerCubit(),
+                                            child: 
+                                          BlocBuilder<AudioplayerCubit, AudioplayerState>(
+                                            builder: (context, state) {
+                                              if (state.recorded == true) 
+                                              {
+                                                return Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: 
+                                                [
+                                                  Text(
+                                                  "Guardar la grabación",
+                                                  style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                    const TextStyle(
+                                                      fontWeight: FontWeight.w700, 
+                                                      fontSize: 16,
+                                                    ),
+                                                    ),
+                                                ),
+                                                SizedBox(
+                                                  height:20),
+                                                Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [       
+                                                    Text(
+                                                      "Nombre de la grabación",
+                                                      style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                        const TextStyle(
+                                                          fontWeight: FontWeight.w500, 
+                                                          fontSize: 14,
+                                                        ),
+                                                        ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 8,
+                                                    ),
+                                                    TextField(
+                                                      decoration: const InputDecoration(
+                                                        border: InputBorder.none,
+                                                        fillColor: Color(0xFFFFFFFF),
+                                                        filled: true,
+                                                        hintText: "Nombre", 
+                                                      ),
+                                                      onChanged: (val) {
+                                                        context.read<AudioplayerCubit>().changeAudioName(val);
+
+                                                      },
+                                                    ),
+                                                    
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 30
+                                                ),
+                                                Row(
+                                                  children: [
+                                                  Expanded(
+                                                    child: Container(
+                                                      child: RawMaterialButton(
+                                                        fillColor: Color(0xffC4C4C4),
+                                                        padding: const EdgeInsets.symmetric(vertical: 15.0),
+                                                        onPressed: () {
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: const Text(
+                                                        "Borrar",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.w500, 
+                                                            fontSize: 14,
+                                                          ),
+                                                      ),
+                                                      )),
+                                                  ),
+                                                  SizedBox(
+                                                    width:100
+                                                  ),
+                                                Expanded(
+                                                  child: Container(
+                                                      child: RawMaterialButton(
+                                                        fillColor: Theme.of(context).primaryColor,
+                                                        padding: const EdgeInsets.symmetric(vertical: 15.0),
+                                                        onPressed:() =>
+                                                          asyncUpload(state.source, state.duration ,state.sourceName ,context, () {
+                                                            context
+                                                                .read<AudioplayerCubit>()
+                                                                .uploaded();
+                                                          }),
+                                                        child: const Text(
+                                                        "Guardar",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.w500, 
+                                                            fontSize: 14,
+                                                          ),
+                                                      ),
+                                                      )),
+                                                )                                                  ],
+                                                )
+                                                ]
+                                                ); 
+                                              }
+                                              else{
+                                                return AudioRecorder(
+                                                onStop: (path, audioPath, duration) {
+                                                  setState(() {
+                                                  durationTotal = duration;
+                                                  showPlayer = true;
+                                                  context.read<AudioplayerCubit>().recordComplete(audioPath ?? '');
+                                                  context.read<AudioplayerCubit>().update(
+                                                    audioPath, 'Audio Grabado', durationTotal, false);
+    
+                                                });
+                                                },
+                                              );
+                                              }
+                                              }))
+                                        );
+                                      },
                                     );
                                   },
-                                );
-                              },
+                                  //padding: EdgeInsets.all(8.0),
+                                  child: Ink(
+                                    decoration: BoxDecoration(
+                                    border: Border.all(color: const Color(0xFFF5F5F5), width: 5),
+                                    color: Color(0XFFFF463A),
+                                    borderRadius: BorderRadius.circular(40.0)),
+                                    child: InkWell(
+                                    child: SizedBox(width: 50, height: 50),
+                                          ),
+                                  ),
+                                ),
+                              ),
                             ),
                           )
                   //  Container(
@@ -207,7 +448,8 @@ class HomeScreen extends StatelessWidget {
                   //      )
                   ],
                 )));
+        }),
+      );
   }
-
 }
 

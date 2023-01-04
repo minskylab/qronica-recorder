@@ -43,7 +43,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     null,
   ];
   String audioPath = "";
-  int durationTotal = 0;
+  String durationTotal = "";
   List<String> projectIds = [];
   final StorageService storage = StorageService();
 

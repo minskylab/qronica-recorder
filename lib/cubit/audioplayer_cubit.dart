@@ -7,7 +7,27 @@ part 'audioplayer_state.dart';
 class AudioplayerCubit extends Cubit<AudioplayerState> {
   AudioplayerCubit() : super(AudioplayerState());
 
-  void update(String? audioPath,String audioName, int durationTotal, bool audio) {
+  
+  void recordComplete(String source)
+  {
+     emit(
+      state.copyWith(
+        recorded: true,
+        source: source
+      ),
+    );
+  }
+
+  void changeAudioName(String name)
+  {
+         emit(
+      state.copyWith(
+        sourceName: name,
+      ),
+    );
+  }
+
+  void update(String? audioPath,String audioName, String? durationTotal, bool audio) {
     emit(
       state.copyWith(
         status: StatusAudioPlayer.loading,

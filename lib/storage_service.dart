@@ -1,4 +1,6 @@
 import 'dart:io' as io;
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:qronica_recorder/local_storage.dart';
@@ -31,14 +33,23 @@ class StorageService {
 
   Future<void> uploadAudio(
     String path,
+    String? duration,
     String fileName,
-    int duration,
     List<String> projectIds,
   ) async {
+    Uint8List uint8list = Uint8List(0);
     await getCurrentPosition();
+    if (!kIsWeb) {
+      File file = File(path);
+      uint8list = await file.readAsBytes();
+    }
+    else{
     Uri myUri = Uri.parse(path);
     final Response responseData = await get(myUri);
-    final uint8list = responseData.bodyBytes;
+    uint8list = responseData.bodyBytes;
+    }
+    print("Duracionnnn: $duration");
+
     String locationJSON = '''{
       "type": "FeatureCollection",
       "features": [
@@ -66,7 +77,7 @@ class StorageService {
       body: {
         'name': fileName,
         'kind': 'sound',
-        'metadata': '''{"duration": $duration}''',
+        'metadata': '''{"duration": "$duration" }''',
         'location': locationJSON,
         'creator': LocalStorageHelper.getValue('userId')
         //'projects': projectIds[0],

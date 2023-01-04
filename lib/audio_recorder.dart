@@ -33,7 +33,7 @@ class AudioRecorder extends StatefulWidget {
     required this.onStop,
   }) : super(key: key);
 
-  final void Function(List<String?> path, String? audioPath) onStop; 
+  final void Function(List<String?> path, String? audioPath, String? duration) onStop; 
 
 
   @override
@@ -280,7 +280,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
     setState(() {
       _isRecording = false;
     });
-    widget.onStop(_path, _path[_codec.index]);
+    widget.onStop(_path, _path[_codec.index], _recorderTxt);
   }
 
 
@@ -456,6 +456,9 @@ class _AudioRecorderState extends State<AudioRecorder> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                   backgroundColor: Colors.red)
               : Container(),
+          SizedBox(
+            height: 30,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
