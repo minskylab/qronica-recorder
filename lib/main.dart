@@ -46,6 +46,10 @@ class _MyAppState extends State<MyApp> {
               ),
               scaffoldBackgroundColor: const Color(0xFFF5F5F5),
               primaryColor: const Color(0XFF2E6ECD),
+              appBarTheme: const AppBarTheme(
+                iconTheme: IconThemeData(color: Colors.black),
+                color: Color(0xFFF5F5F5), //<-- SEE HERE
+              ),
             ), 
             debugShowCheckedModeBanner: false,
             initialRoute: "/",
@@ -54,6 +58,7 @@ class _MyAppState extends State<MyApp> {
               '/recorderScreen' :(_) => RecorderScreen(),
               '/playerScreen' : (_) => PlayerScreen()
             },
+            
           );
         },
       ),
