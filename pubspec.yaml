@@ -42,7 +42,6 @@ dependencies:
   geolocator: ^9.0.1
   just_audio: ^0.9.28
   audio_video_progress_bar: ^0.9.0
-  flutter_media_metadata: ^1.0.0
   pocketbase: ^0.4.0
   flutter_bloc: ^8.1.1
   equatable: ^2.0.5
@@ -52,7 +51,7 @@ dependencies:
   toast: ^0.2.9
   flutter_sound: ^9.2.13
   path_provider: ^2.0.2
-  permission_handler: ^6.0.1
+  permission_handler: ^10.2.0
   path: ^1.6.4
   intl: ^0.17.0
   audio_session: ^0.1.6

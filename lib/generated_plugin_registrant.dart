@@ -11,7 +11,6 @@ import 'package:audioplayers_web/audioplayers_web.dart';
 import 'package:cloud_firestore_web/cloud_firestore_web.dart';
 import 'package:firebase_auth_web/firebase_auth_web.dart';
 import 'package:firebase_core_web/firebase_core_web.dart';
-import 'package:flutter_media_metadata/src/flutter_media_metadata_web.dart';
 import 'package:flutter_sound_record_web/flutter_sound_record_web.dart';
 import 'package:flutter_sound_web/flutter_sound_web.dart';
 import 'package:geolocator_web/geolocator_web.dart';
@@ -28,7 +27,6 @@ void registerPlugins(Registrar registrar) {
   FirebaseFirestoreWeb.registerWith(registrar);
   FirebaseAuthWeb.registerWith(registrar);
   FirebaseCoreWeb.registerWith(registrar);
-  MetadataRetriever.registerWith(registrar);
   FlutterSoundRecordPluginWeb.registerWith(registrar);
   FlutterSoundPlugin.registerWith(registrar);
   GeolocatorPlugin.registerWith(registrar);
