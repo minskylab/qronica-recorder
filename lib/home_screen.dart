@@ -282,129 +282,135 @@ class _HomeScreenState extends State<HomeScreen> {
                         child:  TextButton(
                         onPressed: () {
                           showModalBottomSheet(
+                              isScrollControlled: true,
                               context: context,
                               builder: (context) {
-                                return Container(
-                                  height:300,
-                                  padding: EdgeInsets.all(30),
-                                  child: BlocProvider(
-                                    create: (context) => AudioplayerCubit(),
-                                    child: 
-                                      BlocBuilder<AudioplayerCubit, AudioplayerState>(
-                                      builder: (context, state) {
-                                        if (state.recorded == true) 
-                                        {
-                                          return Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: 
-                                              [
-                                                Text(
-                                                  "Guardar la grabación",
-                                                  style: Theme.of(context).textTheme.bodyText1?.merge(
-                                                    const TextStyle(
-                                                      fontWeight: FontWeight.w700, 
-                                                      fontSize: 16,
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom),
+                                  child: Container(
+                                    height:300,
+                                    padding: EdgeInsets.all(30),
+                                    child: BlocProvider(
+                                      create: (context) => AudioplayerCubit(),
+                                      child: 
+                                        BlocBuilder<AudioplayerCubit, AudioplayerState>(
+                                        builder: (context, state) {
+                                          if (state.recorded == true) 
+                                          {
+                                            return Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: 
+                                                [
+                                                  Text(
+                                                    "Guardar la grabación",
+                                                    style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                      const TextStyle(
+                                                        fontWeight: FontWeight.w700, 
+                                                        fontSize: 16,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                const SizedBox(height:20),
-                                                Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [       
-                                                    Text(
-                                                      "Nombre de la grabación",
-                                                      style: Theme.of(context).textTheme.bodyText1?.merge(
-                                                        const TextStyle(
-                                                          fontWeight: FontWeight.w500, 
-                                                          fontSize: 14,
+                                                  const SizedBox(height:20),
+                                                  Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [       
+                                                      Text(
+                                                        "Nombre de la grabación",
+                                                        style: Theme.of(context).textTheme.bodyText1?.merge(
+                                                          const TextStyle(
+                                                            fontWeight: FontWeight.w500, 
+                                                            fontSize: 14,
+                                                          ),
                                                         ),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 8,
+                                                      ),
+                                                      TextField(
+                                                        decoration: const InputDecoration(
+                                                          border: InputBorder.none,
+                                                          fillColor: Color(0xFFFFFFFF),
+                                                          filled: true,
+                                                          hintText: "Nombre", 
+                                                        ),
+                                                        onChanged: (val) {
+                                                          context.read<AudioplayerCubit>().changeAudioName(val);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                const SizedBox(
+                                                  height: 30
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Container(
+                                                        child: RawMaterialButton(
+                                                          fillColor: Color(0xffC4C4C4),
+                                                          padding: const EdgeInsets.symmetric(vertical: 15.0),
+                                                          onPressed: () {
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: const Text(
+                                                            "Borrar",
+                                                            style: TextStyle(
+                                                                fontWeight: FontWeight.w500, 
+                                                                fontSize: 14,
+                                                            ),
+                                                          ),
+                                                        )
                                                       ),
                                                     ),
                                                     const SizedBox(
-                                                      height: 8,
+                                                      width:100
                                                     ),
-                                                    TextField(
-                                                      decoration: const InputDecoration(
-                                                        border: InputBorder.none,
-                                                        fillColor: Color(0xFFFFFFFF),
-                                                        filled: true,
-                                                        hintText: "Nombre", 
-                                                      ),
-                                                      onChanged: (val) {
-                                                        context.read<AudioplayerCubit>().changeAudioName(val);
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              const SizedBox(
-                                                height: 30
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: RawMaterialButton(
-                                                        fillColor: Color(0xffC4C4C4),
-                                                        padding: const EdgeInsets.symmetric(vertical: 15.0),
-                                                        onPressed: () {
-                                                          Navigator.pop(context);
-                                                        },
-                                                        child: const Text(
-                                                          "Borrar",
-                                                          style: TextStyle(
-                                                              fontWeight: FontWeight.w500, 
-                                                              fontSize: 14,
+                                                    Expanded(
+                                                      child: Container(
+                                                        child: RawMaterialButton(
+                                                          fillColor: Theme.of(context).primaryColor,
+                                                          padding: const EdgeInsets.symmetric(vertical: 15.0),
+                                                          onPressed:() =>
+                                                            asyncUpload(state.source, state.duration ,state.sourceName ,context, () {
+                                                            context
+                                                              .read<AudioplayerCubit>()
+                                                              .uploaded();
+                                                            Navigator.pop(context);
+                                                          }),
+                                                          child: const Text(
+                                                            "Guardar",
+                                                            style: TextStyle(
+                                                                fontWeight: FontWeight.w500, 
+                                                                fontSize: 14,
+                                                              ),
                                                           ),
-                                                        ),
-                                                      )
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    width:100
-                                                  ),
-                                                  Expanded(
-                                                    child: Container(
-                                                      child: RawMaterialButton(
-                                                        fillColor: Theme.of(context).primaryColor,
-                                                        padding: const EdgeInsets.symmetric(vertical: 15.0),
-                                                        onPressed:() =>
-                                                          asyncUpload(state.source, state.duration ,state.sourceName ,context, () {
-                                                          context
-                                                            .read<AudioplayerCubit>()
-                                                            .uploaded();
-                                                          Navigator.pop(context);
-                                                        }),
-                                                        child: const Text(
-                                                          "Guardar",
-                                                          style: TextStyle(
-                                                              fontWeight: FontWeight.w500, 
-                                                              fontSize: 14,
-                                                            ),
-                                                        ),
-                                                      )
-                                                    ),
-                                                  )                                                  ],
-                                              )
-                                            ]
-                                          ); 
+                                                        )
+                                                      ),
+                                                    )                                                  ],
+                                                )
+                                              ]
+                                            ); 
+                                          }
+                                          else{
+                                            return AudioRecorder(
+                                              onStop: (path, audioPath, duration) {
+                                                setState(() {
+                                                durationTotal = duration;
+                                                showPlayer = true;
+                                                context.read<AudioplayerCubit>().recordComplete(audioPath ?? '');
+                                                context.read<AudioplayerCubit>().update(
+                                                  audioPath, 'Audio Grabado', durationTotal, false);
+                                                });
+                                              },
+                                            );
+                                          }
                                         }
-                                        else{
-                                          return AudioRecorder(
-                                            onStop: (path, audioPath, duration) {
-                                              setState(() {
-                                              durationTotal = duration;
-                                              showPlayer = true;
-                                              context.read<AudioplayerCubit>().recordComplete(audioPath ?? '');
-                                              context.read<AudioplayerCubit>().update(
-                                                audioPath, 'Audio Grabado', durationTotal, false);
-                                              });
-                                            },
-                                          );
-                                        }
-                                      }
+                                      )
                                     )
-                                  )
+                                  ),
                                 );
                               },
                             );
