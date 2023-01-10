@@ -28,6 +28,8 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSMicrophoneUsageDescription</key>
+<string>Need microphone access for uploading audio</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 <string>This application requires location services to work</string>
 
