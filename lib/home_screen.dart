@@ -21,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool showPlayer = false;
+  bool saved = false;
     List<String> projectIds = [];
       String? durationTotal = "";
 
@@ -29,11 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     showPlayer = false;
+    saved = false;
     super.initState();
   }
 
   Future<void> asyncUpload(String? audioPath, String? duracion, String? name, BuildContext context, VoidCallback onSuccess) async {
     setState(() {
+      saved = true;
       context.read<AudioplayerCubit>().uploading();
     });
     String path = "";
@@ -46,9 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     final fileName = name ?? '';
     await storage.uploadAudio(path, duracion ?? '00:00:00',fileName, projectIds);
-    print("duracion:$duracion");
-    print(audioPath);
-
+    setState(() {
+      saved = false;
+    });
     onSuccess.call();
   }
 
@@ -352,9 +355,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         child: RawMaterialButton(
                                                           fillColor: Color(0xffC4C4C4),
                                                           padding: const EdgeInsets.symmetric(vertical: 15.0),
-                                                          onPressed: () {
+                                                          onPressed: saved == false ? () {
                                                             Navigator.pop(context);
-                                                          },
+                                                          } : null,
                                                           child: const Text(
                                                             "Borrar",
                                                             style: TextStyle(
@@ -373,13 +376,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         child: RawMaterialButton(
                                                           fillColor: Theme.of(context).primaryColor,
                                                           padding: const EdgeInsets.symmetric(vertical: 15.0),
-                                                          onPressed:() =>
+                                                          onPressed: saved == false ? () =>
                                                             asyncUpload(state.source, state.duration ,state.sourceName ,context, () {
                                                             context
                                                               .read<AudioplayerCubit>()
                                                               .uploaded();
                                                             Navigator.pop(context);
-                                                          }),
+                                                          }) : null,
                                                           child: const Text(
                                                             "Guardar",
                                                             style: TextStyle(
