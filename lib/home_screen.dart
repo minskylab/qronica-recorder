@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(
-                    height: 77
+                    height: 60
                   ),
                   const Text(
                     "Grabaciones",
@@ -278,6 +278,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Center(
                     child:  ClipOval(
                       child: Material(
+                        shape: CircleBorder(
+                          side: BorderSide(width: 5.0, color: Colors.black)
+                        ),
                         color: Colors.black,
                         child:  TextButton(
                         onPressed: () {
@@ -286,8 +289,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               context: context,
                               builder: (context) {
                                 return Padding(
-                                  padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom),
+                                  padding: EdgeInsets.symmetric(
+                                  vertical: MediaQuery.of(context).viewInsets.bottom),
                                   child: Container(
                                     height:300,
                                     padding: EdgeInsets.all(30),
@@ -418,7 +421,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           //padding: EdgeInsets.all(8.0),
                           child: Ink(
                             decoration: BoxDecoration(
-                              border: Border.all(color: const Color(0xFFF5F5F5), width: 5),
+                              border: Border.all(color: const Color(0xFFF5F5F5), width: 8),
                               color: const Color(0XFFFF463A),
                               borderRadius: BorderRadius.circular(40.0)
                             ),

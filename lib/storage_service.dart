@@ -44,9 +44,9 @@ class StorageService {
       uint8list = await file.readAsBytes();
     }
     else{
-    Uri myUri = Uri.parse(path);
-    final Response responseData = await get(myUri);
-    uint8list = responseData.bodyBytes;
+      Uri myUri = Uri.parse(path);
+      final Response responseData = await get(myUri);
+      uint8list = responseData.bodyBytes;
     }
     print("Duracionnnn: $duration");
 

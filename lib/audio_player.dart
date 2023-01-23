@@ -364,6 +364,18 @@ class _AudioPlayerState extends State<AudioPlayer> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Container(
+          height: 30.0,
+          child: Slider(
+            activeColor: Colors.black,
+            inactiveColor: Color(0xffD9D9D9),
+              value: min(sliderCurrentPosition, maxDuration),
+              min: 0.0,
+              max: maxDuration,
+              onChanged: (value) async {
+                await seekToPlayer(value.toInt());
+              },
+              divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt())),
+        Container(
           margin: EdgeInsets.only(top: 12.0, bottom: 16.0),
           child: Text(
             _playerTxt,
@@ -407,16 +419,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
             ),
           ],
         ),
-        Container(
-            height: 30.0,
-            child: Slider(
-                value: min(sliderCurrentPosition, maxDuration),
-                min: 0.0,
-                max: maxDuration,
-                onChanged: (value) async {
-                  await seekToPlayer(value.toInt());
-                },
-                divisions: maxDuration == 0.0 ? 1 : maxDuration.toInt())),
+
       ],
     );
 

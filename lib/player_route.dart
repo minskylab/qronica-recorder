@@ -50,111 +50,115 @@ class PlayerRoute extends StatelessWidget {
         onPressed: () => Navigator.of(context).pop(),
       ),
       title: Padding(
-            padding: EdgeInsets.only(left: 16),
-            child:  Text(
-              snapshot.data['name'],
-              style: TextStyle(
-                color: Color(0XFF1E1E1E),
-                fontSize: 18.0,
-                fontWeight: FontWeight.w600,
+            padding: EdgeInsets.only(left: 0),
+            child:  Center(
+              child: Text(
+                snapshot.data['name'],
+                style: TextStyle(
+                  color: Color(0XFF1E1E1E),
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
       ),
-      body: Container(
-        padding: EdgeInsets.only(top: 40, left: 24, right:24),
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              snapshot.data['name'],
-              style: Theme.of(context).textTheme.bodyText1?.merge(
-                const TextStyle(
-                  fontWeight: FontWeight.w700, 
-                  fontSize: 16,
+      body: Center(
+        child: Container(
+          padding: EdgeInsets.only(top: 40, left: 24, right:24),
+          width: 700,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                snapshot.data['name'],
+                style: Theme.of(context).textTheme.bodyText1?.merge(
+                  const TextStyle(
+                    fontWeight: FontWeight.w700, 
+                    fontSize: 16,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 12,),
-            Row(
-              children: [
-                Text(
-                  "Titulo del proyecto",
-                  style: Theme.of(context).textTheme.bodyText1?.merge(
-                    const TextStyle(
-                      fontWeight: FontWeight.bold, 
-                      fontSize: 14,
+              SizedBox(height: 12,),
+              Row(
+                children: [
+                  Text(
+                    "Titulo del proyecto",
+                    style: Theme.of(context).textTheme.bodyText1?.merge(
+                      const TextStyle(
+                        fontWeight: FontWeight.bold, 
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                ),
-                const Spacer(),
-                Text(
-                  "",
-                  style: Theme.of(context).textTheme.bodyText1?.merge(
-                    const TextStyle(
-                      fontWeight: FontWeight.w500, 
-                      fontSize: 14,
+                  const Spacer(),
+                  Text(
+                    "",
+                    style: Theme.of(context).textTheme.bodyText1?.merge(
+                      const TextStyle(
+                        fontWeight: FontWeight.w500, 
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 12,),
+              Row(
+                children: [
+                  Text(
+                    formattedDateNow == formattedRecordDate ?
+                    "Grabado a las $time" :
+                    "Grabado, $formattedRecordDate a las $time",
+                    style: Theme.of(context).textTheme.bodyText1?.merge(
+                      const TextStyle(
+                        fontWeight: FontWeight.w500, 
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                )
-              ],
-            ),
-            SizedBox(height: 12,),
-            Row(
-              children: [
-                Text(
-                  formattedDateNow == formattedRecordDate ?
-                  "Grabado a las $time" :
-                  "Grabado, $formattedRecordDate a las $time",
-                  style: Theme.of(context).textTheme.bodyText1?.merge(
-                    const TextStyle(
-                      fontWeight: FontWeight.w500, 
-                      fontSize: 14,
+                  const Spacer(),
+                  Text(
+                    "",
+                    style: Theme.of(context).textTheme.bodyText1?.merge(
+                      const TextStyle(
+                        fontWeight: FontWeight.w500, 
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
+                    "",
+                    style: Theme.of(context).textTheme.bodyText1?.merge(
+                      const TextStyle(
+                        fontWeight: FontWeight.w500, 
+                        fontSize: 12,
+                      ),
                     ),
                   ),
-                ),
-                const Spacer(),
-                Text(
-                  "",
-                  style: Theme.of(context).textTheme.bodyText1?.merge(
-                    const TextStyle(
-                      fontWeight: FontWeight.w500, 
-                      fontSize: 14,
+                  Spacer(),
+                  Text(
+                    "Duracion de ${snapshot.data['metadata']['duration']}",
+                    style: Theme.of(context).textTheme.bodyText1?.merge(
+                      const TextStyle(
+                        fontWeight: FontWeight.w500, 
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                )
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  "",
-                  style: Theme.of(context).textTheme.bodyText1?.merge(
-                    const TextStyle(
-                      fontWeight: FontWeight.w500, 
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  "Duracion de ${snapshot.data['metadata']['duration']}",
-                  style: Theme.of(context).textTheme.bodyText1?.merge(
-                    const TextStyle(
-                      fontWeight: FontWeight.w500, 
-                      fontSize: 12,
-                    ),
-                  ),
-                )
-              ],
-            ),
-            AudioPlayer(
-              path: _path,
-              sourceType: 'onlineAudio',
-              onlinePath: '${PocketBaseSample.url}/api/files/resources/${snapshot.id}/${snapshot.data['file']}',)
-          ],
-        )
+                  )
+                ],
+              ),
+              AudioPlayer(
+                path: _path,
+                sourceType: 'onlineAudio',
+                onlinePath: '${PocketBaseSample.url}/api/files/resources/${snapshot.id}/${snapshot.data['file']}',)
+            ],
+          )
+        ),
       ),
     );
   }

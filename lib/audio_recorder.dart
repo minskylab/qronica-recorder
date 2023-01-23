@@ -369,13 +369,16 @@ class _AudioRecorderState extends State<AudioRecorder> {
       color = Colors.black;
       return ClipOval(
       child: Material(
+        shape: CircleBorder(
+        side: BorderSide(width: 5.0, color: Colors.black)
+        ),
         color: color,
         child:  TextButton(
           onPressed: onStartRecorderPressed(),
           //padding: EdgeInsets.all(8.0),
           child: Ink(
             decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFF5F5F5), width: 5),
+            border: Border.all(color: const Color(0xFFF5F5F5), width: 8),
             color: Color(0XFFFF463A),
             borderRadius: BorderRadius.circular(40.0)),
             child: InkWell(
